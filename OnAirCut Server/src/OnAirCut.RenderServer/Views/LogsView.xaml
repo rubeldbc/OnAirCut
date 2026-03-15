@@ -1,0 +1,77 @@
+<UserControl x:Class="OnAirCut.RenderServer.Views.LogsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:OnAirCut.RenderServer.ViewModels"
+             xmlns:converters="clr-namespace:OnAirCut.RenderServer.Converters"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:LogsViewModel}">
+
+    <UserControl.Resources>
+        <converters:LogLevelToColorConverter x:Key="LogLevelToColorConverter" />
+    </UserControl.Resources>
+
+    <DockPanel Margin="16">
+        <!-- Toolbar -->
+        <ToolBarTray DockPanel.Dock="Top" Margin="0,0,0,8">
+            <ToolBar Style="{StaticResource MaterialDesignToolBar}">
+                <TextBlock Text="Level:" VerticalAlignment="Center" Margin="0,0,4,0" />
+                <ComboBox ItemsSource="{Binding LevelOptions}"
+                          SelectedItem="{Binding FilterLevel}"
+                          Width="80" VerticalAlignment="Center" />
+                <Separator />
+                <TextBlock Text="Job:" VerticalAlignment="Center" Margin="0,0,4,0" />
+                <TextBox Text="{Binding FilterJobId, UpdateSourceTrigger=PropertyChanged}"
+                         Width="150" VerticalAlignment="Center"
+                         materialDesign:HintAssist.Hint="Job ID filter" />
+                <Separator />
+                <TextBlock Text="Search:" VerticalAlignment="Center" Margin="0,0,4,0" />
+                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Width="200" VerticalAlignment="Center"
+                         materialDesign:HintAssist.Hint="Text search" />
+                <Separator />
+                <Button Command="{Binding FilterCommand}" ToolTip="Apply Filters">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Filter" VerticalAlignment="Center" />
+                        <TextBlock Text="Filter" Margin="4,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding ClearDisplayCommand}" ToolTip="Clear Display">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Eraser" VerticalAlignment="Center" />
+                        <TextBlock Text="Clear" Margin="4,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Separator />
+                <Button Command="{Binding OpenLogFileCommand}" ToolTip="Open Log File">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="FileDocument" VerticalAlignment="Center" />
+                        <TextBlock Text="Open File" Margin="4,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Separator />
+                <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                              IsChecked="{Binding IsAutoScroll}" ToolTip="Auto-scroll" />
+                <TextBlock Text="Auto-scroll" VerticalAlignment="Center" Margin="4,0,0,0" />
+            </ToolBar>
+        </ToolBarTray>
+
+        <!-- Log Entries -->
+        <ListBox x:Name="LogListBox" ItemsSource="{Binding LogEntries}"
+                 Background="Black" BorderThickness="0"
+                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 VirtualizingStackPanel.IsVirtualizing="True"
+                 VirtualizingStackPanel.VirtualizationMode="Recycling">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" FontFamily="Consolas" FontSize="12"
+                               Foreground="{Binding Converter={StaticResource LogLevelToColorConverter}}"
+                               Margin="4,1" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</UserControl>

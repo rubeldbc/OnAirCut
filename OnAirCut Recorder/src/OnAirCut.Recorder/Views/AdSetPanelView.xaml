@@ -1,0 +1,102 @@
+<UserControl x:Class="OnAirCut.Recorder.Views.AdSetPanelView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:OnAirCut.Recorder.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:AdSetPanelViewModel}">
+
+    <materialDesign:Card Padding="12" Margin="4">
+        <DockPanel>
+            <!-- Header -->
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,12">
+                <materialDesign:PackIcon Kind="Advertisements" Width="20" Height="20"
+                                         VerticalAlignment="Center" Margin="0,0,8,0" />
+                <TextBlock Text="Ad Set" FontSize="16" FontWeight="Medium"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+
+            <!-- Ad Set List -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <!-- No Ad Option -->
+                    <RadioButton GroupName="AdSet" Margin="0,0,0,6"
+                                 IsChecked="{Binding NoAdSelected}">
+                        <materialDesign:Card Padding="10" Width="240"
+                                             materialDesign:ElevationAssist.Elevation="Dp1">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="Cancel" Width="18" Height="18"
+                                                             Margin="0,0,8,0" Opacity="0.7"
+                                                             VerticalAlignment="Center" />
+                                    <TextBlock Text="No Ad" FontWeight="Bold" FontSize="13"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+                                <TextBlock Text="Submit clip without any ad insertion"
+                                           FontSize="10" Opacity="0.6" Margin="26,2,0,0" />
+                            </StackPanel>
+                        </materialDesign:Card>
+                    </RadioButton>
+
+                    <!-- Ad Set Items -->
+                    <ItemsControl ItemsSource="{Binding AvailableAdSets}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <RadioButton GroupName="AdSet" Margin="0,0,0,6"
+                                             IsChecked="{Binding IsSelected, RelativeSource={RelativeSource Self}}"
+                                             Command="{Binding DataContext.SelectAdSetCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                             CommandParameter="{Binding}">
+                                    <materialDesign:Card Padding="10" Width="240"
+                                                         materialDesign:ElevationAssist.Elevation="Dp1">
+                                        <materialDesign:Card.Style>
+                                            <Style TargetType="materialDesign:Card"
+                                                   BasedOn="{StaticResource {x:Type materialDesign:Card}}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=RadioButton}}" Value="True">
+                                                        <Setter Property="Background" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </materialDesign:Card.Style>
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="Television" Width="18" Height="18"
+                                                                         Margin="0,0,8,0" Opacity="0.8"
+                                                                         VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding Name}" FontWeight="Bold"
+                                                           FontSize="13" VerticalAlignment="Center" />
+                                            </StackPanel>
+
+                                            <StackPanel Margin="26,4,0,0">
+                                                <TextBlock FontSize="10" Opacity="0.7">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="TVC: {0}">
+                                                            <Binding Path="TvcFile" FallbackValue="None" />
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+
+                                                <TextBlock FontSize="10" Opacity="0.7">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Mode: {0}">
+                                                            <Binding Path="InsertMode" />
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+
+                                                <TextBlock FontSize="10" Opacity="0.7"
+                                                           Text="{Binding OverlayFile, StringFormat='Overlay: {0}', FallbackValue='Overlay: None'}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </materialDesign:Card>
+                                </RadioButton>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </DockPanel>
+    </materialDesign:Card>
+</UserControl>

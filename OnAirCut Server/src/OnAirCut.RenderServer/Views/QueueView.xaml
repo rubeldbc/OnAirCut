@@ -1,0 +1,105 @@
+<UserControl x:Class="OnAirCut.RenderServer.Views.QueueView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:OnAirCut.RenderServer.ViewModels"
+             xmlns:converters="clr-namespace:OnAirCut.RenderServer.Converters"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:QueueViewModel}">
+
+    <UserControl.Resources>
+        <converters:StatusToColorConverter x:Key="StatusToColorConverter" />
+    </UserControl.Resources>
+
+    <DockPanel Margin="16">
+        <!-- Toolbar -->
+        <ToolBarTray DockPanel.Dock="Top" Margin="0,0,0,8">
+            <ToolBar Style="{StaticResource MaterialDesignToolBar}">
+                <Button Command="{Binding RefreshCommand}" ToolTip="Refresh">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Refresh" VerticalAlignment="Center" />
+                        <TextBlock Text="Refresh" Margin="4,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Separator />
+                <Button Command="{Binding RetryJobCommand}" ToolTip="Retry Selected">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Replay" VerticalAlignment="Center" />
+                        <TextBlock Text="Retry" Margin="4,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding CancelJobCommand}" ToolTip="Cancel Selected">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Stop" VerticalAlignment="Center" />
+                        <TextBlock Text="Cancel" Margin="4,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Separator />
+                <Button Command="{Binding OpenOutputCommand}" ToolTip="Open Output Folder">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="FolderOpen" VerticalAlignment="Center" />
+                        <TextBlock Text="Open Output" Margin="4,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+
+        <!-- DataGrid -->
+        <DataGrid ItemsSource="{Binding Jobs}" SelectedItem="{Binding SelectedJob}"
+                  AutoGenerateColumns="False" IsReadOnly="True"
+                  CanUserSortColumns="True" CanUserResizeColumns="True"
+                  SelectionMode="Single" SelectionUnit="FullRow"
+                  materialDesign:DataGridAssist.CellPadding="12 8"
+                  materialDesign:DataGridAssist.ColumnHeaderPadding="12 8"
+                  VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Auto">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="View Detail" Command="{Binding ViewDetailCommand}">
+                        <MenuItem.Icon>
+                            <materialDesign:PackIcon Kind="InformationOutline" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Retry" Command="{Binding RetryJobCommand}">
+                        <MenuItem.Icon>
+                            <materialDesign:PackIcon Kind="Replay" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Cancel" Command="{Binding CancelJobCommand}">
+                        <MenuItem.Icon>
+                            <materialDesign:PackIcon Kind="Stop" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="Open Output" Command="{Binding OpenOutputCommand}">
+                        <MenuItem.Icon>
+                            <materialDesign:PackIcon Kind="FolderOpen" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Job ID" Binding="{Binding JobId}" Width="180" />
+                <DataGridTextColumn Header="Title" Binding="{Binding TitleNormalized}" Width="200" />
+                <DataGridTextColumn Header="Source" Binding="{Binding SourceName}" Width="120" />
+                <DataGridTextColumn Header="AdSet" Binding="{Binding AdSetName}" Width="100" />
+                <DataGridTemplateColumn Header="Status" Width="120" SortMemberPath="Status">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <materialDesign:Chip Content="{Binding Status}" IconBackground="Transparent"
+                                                 Background="{Binding Status, Converter={StaticResource StatusToColorConverter}}"
+                                                 Foreground="White" FontSize="11" Padding="8,2" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Duration" Width="80"
+                                    Binding="{Binding DurationSeconds, StringFormat={}{0:F1}s}" />
+                <DataGridTextColumn Header="Submitted" Width="140"
+                                    Binding="{Binding SubmittedAt, StringFormat={}{0:HH:mm:ss}}" />
+                <DataGridTextColumn Header="Error" Binding="{Binding ErrorMessage}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</UserControl>

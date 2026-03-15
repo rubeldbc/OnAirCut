@@ -1,0 +1,133 @@
+<UserControl x:Class="OnAirCut.Recorder.Views.RecordingControlsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:OnAirCut.Recorder.ViewModels"
+             xmlns:converters="clr-namespace:OnAirCut.Recorder.Converters"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:RecordingControlsViewModel}">
+
+    <UserControl.Resources>
+        <converters:RecordingStateToVisibilityConverter x:Key="StateToVisibility" />
+        <converters:TimeSpanToStringConverter x:Key="TimeSpanToString" />
+        <converters:StringNotEmptyToVisibilityConverter x:Key="StringNotEmptyToVisibility" />
+        <converters:IntPositiveToVisibilityConverter x:Key="IntPositiveToVisibility" />
+        <converters:InverseBoolConverter x:Key="InverseBool" />
+    </UserControl.Resources>
+
+    <!-- Fixed-height control bar — NEVER changes size -->
+    <materialDesign:Card Padding="8,6" Margin="4" Height="64">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Column 0: Record/Stop Button (fixed 48x48 space) -->
+            <Grid Grid.Column="0" Width="48" Height="48" VerticalAlignment="Center">
+                <!-- Record Button -->
+                <Button Command="{Binding StartRecordingCommand}"
+                        Visibility="{Binding RecordingState, Converter={StaticResource StateToVisibility}, ConverterParameter=ReadyToRecord}"
+                        Style="{StaticResource MaterialDesignFloatingActionButton}"
+                        Width="48" Height="48"
+                        Background="#EF5350" BorderBrush="#EF5350"
+                        materialDesign:ElevationAssist.Elevation="Dp4"
+                        ToolTip="Start Recording (F5)">
+                    <materialDesign:PackIcon Kind="Record" Width="24" Height="24" />
+                </Button>
+
+                <!-- Stop Button (same position, replaces Record) -->
+                <Button Command="{Binding StopRecordingCommand}"
+                        Visibility="{Binding RecordingState, Converter={StaticResource StateToVisibility}, ConverterParameter=Recording}"
+                        Style="{StaticResource MaterialDesignFloatingActionButton}"
+                        Width="48" Height="48"
+                        Background="#FF7043" BorderBrush="#FF7043"
+                        ToolTip="Stop Recording (F6)">
+                    <materialDesign:PackIcon Kind="Stop" Width="24" Height="24" />
+                </Button>
+            </Grid>
+
+            <!-- Column 1: Capture Text + Cancel + REC indicator -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="6,0,0,0">
+                <!-- Capture Text Button — disabled while OCR is running to prevent rapid clicks -->
+                <Button Command="{Binding CaptureTextCommand}"
+                        IsEnabled="{Binding IsCapturing, Converter={StaticResource InverseBool}}"
+                        Visibility="{Binding RecordingState, Converter={StaticResource StateToVisibility}, ConverterParameter='ReadyToRecord,Recording'}"
+                        Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryButton}"
+                        Width="36" Height="36"
+                        Background="#FFA726" BorderBrush="#FFA726"
+                        ToolTip="Capture Text (OCR)">
+                    <materialDesign:PackIcon Kind="TextRecognition" Width="18" Height="18" />
+                </Button>
+
+                <!-- Cancel Button -->
+                <Button Command="{Binding CancelClipCommand}"
+                        Visibility="{Binding RecordingState, Converter={StaticResource StateToVisibility}, ConverterParameter=Recording}"
+                        Style="{StaticResource MaterialDesignIconButton}"
+                        Foreground="#EF5350" Width="28" Height="28" Margin="4,0,0,0"
+                        ToolTip="Cancel recording">
+                    <materialDesign:PackIcon Kind="Close" Width="16" Height="16" />
+                </Button>
+
+                <!-- REC indicator -->
+                <StackPanel Orientation="Horizontal" Margin="6,0,0,0"
+                            Visibility="{Binding RecordingState, Converter={StaticResource StateToVisibility}, ConverterParameter=Recording}"
+                            VerticalAlignment="Center">
+                    <Ellipse Width="10" Height="10" Fill="#EF5350" Margin="0,0,4,0">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Style.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever">
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                 From="1.0" To="0.3" Duration="0:0:0.5"
+                                                                 AutoReverse="True" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <TextBlock Text="REC" FontWeight="Bold" Foreground="#EF5350"
+                               FontSize="12" VerticalAlignment="Center" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Column 2: Captured text — click to copy, Ctrl+click to open file -->
+            <Border Grid.Column="2" Background="Transparent" Cursor="Hand"
+                    VerticalAlignment="Center" HorizontalAlignment="Center" Margin="12,0"
+                    MouseLeftButtonUp="CapturedText_MouseLeftButtonUp"
+                    Visibility="{Binding LastCapturedText, Converter={StaticResource StringNotEmptyToVisibility}}"
+                    ToolTip="Click to copy | Ctrl+Click to open file location">
+                <TextBlock Text="{Binding LastCapturedText}"
+                           FontSize="20"
+                           FontFamily="{StaticResource NotoSansBengali}"
+                           Foreground="#FFA726"
+                           FontWeight="Medium"
+                           TextTrimming="CharacterEllipsis" />
+            </Border>
+
+            <!-- Column 3: Timer (when recording, Consolas font) -->
+            <TextBlock Grid.Column="3"
+                       FontFamily="Consolas" FontSize="18" FontWeight="Medium"
+                       Text="{Binding ElapsedTime, Converter={StaticResource TimeSpanToString}}"
+                       Visibility="{Binding RecordingState, Converter={StaticResource StateToVisibility}, ConverterParameter='Recording'}"
+                       VerticalAlignment="Center" Margin="8,0" />
+
+            <!-- Column 4: Pending badge (fixed position, right edge) -->
+            <materialDesign:Badged Grid.Column="4" Badge="{Binding PendingClipsCount}"
+                                   BadgeColorZoneMode="PrimaryMid"
+                                   VerticalAlignment="Center" Margin="4,0,0,0">
+                <materialDesign:PackIcon Kind="PlaylistPlay" Width="22" Height="22"
+                                         ToolTip="Pending clips — see right panel" Opacity="0.6" />
+            </materialDesign:Badged>
+        </Grid>
+    </materialDesign:Card>
+</UserControl>

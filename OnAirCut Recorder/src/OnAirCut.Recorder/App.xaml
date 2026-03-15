@@ -1,0 +1,18 @@
+<Application x:Class="OnAirCut.Recorder.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme BaseTheme="Dark"
+                                             PrimaryColor="Blue"
+                                             SecondaryColor="Amber" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Embedded Noto Sans Bengali font for OCR text display -->
+            <FontFamily x:Key="NotoSansBengali">pack://application:,,,/Resources/Fonts/#Noto Sans Bengali</FontFamily>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

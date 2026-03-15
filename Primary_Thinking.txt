@@ -1,0 +1,1551 @@
+
+
+একটি সফটওয়্যার বানাতে চাই যার কাজ হচ্ছে লাইভ ফিড থেকে নিউজের পার্ট আলাদা করে কেটে সেগুলো মধ্যে আলাদা ভিডিওর টুকরা ঢুকাবে এছাড়া ওভারলে বিজ্ঞাপণ যোগ করে ffmpeg ব্যবহার করে রেন্ডার করবে। লাইভ ফিড থেকে পাওয়া ভিডিওর মধ্যের একটা নির্দিষ্ট স্থান থেকে পরিষ্কারভাবে বাংলায় লেখা টেক্সটকে এআইর মাধ্যমে ক্যাপচার করে সেটিকে ফাইল নেম হিসেবে ব্যবহার করা হবে। এটি হচ্ছে সফটওয়্যারটির মুল কাজ। মুলত টিভিতে সম্প্রচারিত হওয়া নিউজে ডিজিটাল প্লাটফরমে রিয়েল টাইম বিজ্ঞাপণ যোগ করে সেটাকে যথাযথ নাম দিয়ে নতুন ফাইল এক্সপোর্ট করাই হচ্ছে এর মূল উদ্দেশ্য যাতে করে নিউজ অন-এয়ার হওয়ার ২/৩ মিনিটের মধ্যে সেটি ডিজিটাল প্লাটফরম যেমন ইউটিউব, ফেসবুক, টিকটকে আপলোড করার উপযোগী হয়ে তৈরি হয়ে যায়। 
+
+সফটওয়্যারটি নাম হবে OnAirCut
+
+কিভাবে করা হবে সেটির বিস্তারিত বর্ণনা।
+তৈরি করা হবে C# WPF materialdesignerxml ব্যবহার করে। 
+[১] একটি ইন্টারফেস থাকবে যেখানে লাইভ ভিডিওর সোর্স কানেক্ট করে অডিও কন্ট্রোলারসহ রেকর্ড করার ব্যবস্থা থাকবে। একজন ইউজার কানে হেডফোন লাগিয়ে ভিডিওটিকে রিয়েলটাইম প্লে শুনবে। এই ফিডটি মুলত একটি নিউজ চ্যানেলের কোন এক ঘন্টার লাইভ নিউজ ফিড। যখন প্রেজেন্টার একটি নিউজ স্টোরি পড়া শুরু করবে তখন ম্যানুয়ালি রেকর্ড দিবে, পড়া শেষ হলে এবং ভিডিও রিপোর্ট অংশটি পড়া শেষ হলে ম্যানুয়ালি রেকর্ড অফ করবে। মাঝখানে যে সময় থাকবে সেসময় ওই ভিডিওর জন্য সে একই ইন্টারফেস থেকে একটি বিজ্ঞাপণ সেট নির্ধারণ করে দিবে। টিভিসি বিজ্ঞাপণ সেট হতে পারে একটি ছোট যেমন ৬-১০ সেকেন্ডের বিজ্ঞাপণ যেটা ভিডিওর মাঝ বরাবর বা নির্দিষ্ট সেট করা কোনো একটি সময়ে বসবে। আরেকটি হবে একটি ওভারলে টাইপের গ্রাফিক্স। যেটিও ওই ভিডিওর সাথে উপরে ওভারলে হয়ে ffmpeg দিয়ে বাইন্ড করে নতুন একটি ভিডিও এক্সপোর্ট করে দিবে। ffmpeg যে পিসিতে রেন্ডার করবে সেটি অন্য একটি রেন্ডার পিসি একই নেটওয়ার্কে থাকবে। সেই একই নেটওয়ার্কে একটি শেয়ারড ফোল্ডারে ওভারলে এবং টিভিসি থাকবে। রেকর্ডার পিসি বা ইন্টারফেসে শেয়ারড ফোল্ডারের সেটগুলো দেখা যাবে। সেই সেটগুলো হতে পারে একটি ফোল্ডারের নাম যেটি রেডিও বাটন দিয়ে সিলেক্ট করে দিলেই রেন্ডার সার্ভারে একটি কমান্ড জমা হবে বা একটি রেন্ডার দিতে হবে এমন একটি কিউ তৈরি হবে। লাইভ ফিড থেকে রেকর্ড হওয়া ভিডিওটি শেয়ার্ড ফোল্ডারে রেকর্ড হওয়ার সাথে সাথে মানে যখনই কোন একটি স্টোরির রেকর্ড অফ করা হবে তখনি সেটাকে নিয়ে ffmpeg নির্দিষ্ট কিছু রুলস অনুযায়ী রেন্ডার শুরু করবে। যদি একটি রেন্ডার চলাকালীন অবস্থায় আরেকটি রেন্ডার রিকোয়েষ্ট আসে তাহলে সেগুলো কিউ আকারে থাকবে এবং একটির রেন্ডার শেষ হলে নতুন আরেকটির রেন্ডার করবে। রেকর্ডার ইন্টারফেস থেকে রেকর্ড পাঠানোর পর সার্ভারে পৌছার সাথে সাথেই আরো দুটি ঘটনা ঘটবে। একটি আলাদা ffmpeg ইন্সট্যান্স সার্ভারে ২০টি ফ্রেম এক্সট্রাক্ট করে একটি আলাদা ফোল্ডারে রাখবে। ফোল্ডারের নামটি হবে ওই ভিডিও থেকে এক্সট্রাক্ট করা ইমেজের নির্দিষ্ট জায়গা থেকে এআইএর কোনো মডেল ব্যবহর করে ক্যাপচার করা টেক্সট এবং একই টেক্সট দিয়ে নতুন বিজ্ঞাপণসহ ফাইলটি রেন্ডার হওয়ার পর রিনেম করে ওই একই টেক্সটে একটি নামকরণ করা ফোল্ডারের মধ্যে রাখবে। অর্থাৎ ক্যাপচার করা টেক্সট থেকে তৈরি হওয়া একটি ফোল্ডারের মধ্যেই ওই একই নামে একটি নতুন বিজ্ঞাপণসহ ভিডিও ফাইল এবং ২০টি মুল ভিডিও থেকে এক্সট্রাক্ট করা ফ্রেম থাকবে যেগুলো পরবর্তীতে থাম্বনেইল তৈরির জন্য ব্যবহার করা হবে। এই টেক্সটি আবার একটি ডাটাবেজে টেক্সট এবং অনএয়ার ডেট-টাইম সহ রেকর্ড থাকবে। এই টেক্সটি বা আগে তৈরি হওয়া ফাইলের নামের লিষ্টগুলো একটি ডাটাবেজে থাকবে যা রেকর্ডার ইন্টারফেসে দেখা যাবে। রেকর্ডার ইন্টারফেসে যে রেকর্ড করবে সে যাতে বুঝতে পারে যে কোন কোন নিউজগুলো আগে এরই মধ্যে প্রসেস করা হয়েছে। 
+
+রেকর্ডার পিসি থেকে সরাসরি রেন্ডার সার্ভারে ডাটা পাঠাতে FFmpeg এর পাইপিং (Piping) বা সরাসরি নেটওয়ার্ক ড্রাইভে ফাইল রাইট করার মেথড ব্যবহার করার প্রয়োজন নেই কারণ রেকর্ডিং পিসির রেকর্ড করা ফাইলগুলো সেটিংস থেকে নির্ধারণ করে দেয়া একটি শেয়ারড নেটওয়ার্ক ফোল্ডারে থাকবে যেখানে একইভাবে রেন্ডার পিসিও একসেস করে ফাইল নিতে পারবে।
+
+লাইভ ফিড ছাড়াও যাতে কোন রেকর্ড করা বড় যেমন ১ ঘন্টার ফাইল প্লে করে সেটিকে দিয়ে কাজ করা যায় অথবা ইউটিউবের কোনো লাইভ নিউজের লিংক ইনপুট করে সেটা রেকর্ড করা যায় এমন ব্যবস্থাও থাকতে হবে। অর্থাৎ ইনপুট হিসেবে তিন ধরণের ব্যবস্থা থাকতে হবে যেমন লাইভ ফিড যেটা হতে পারে ব্লাকম্যাজিক বা এমন কোনো ধরণের ক্যাপচার ডিভাইস থেকে আসবে, অথবা হতে পারে লোকাল ড্রাইভে আগেই রেকর্ড করে রাখা পুরো ১ ঘন্টার বিজ্ঞাপণ বা নিউজ নয় এমন সবকিছু সহ একটি  ফাইল যেটাকে প্লে করে রিয়েল টাইম শুনে রেকর্ড অন/অফ করার মাধ্যমে ক্লিপ বের করা হবে। 
+
+রেন্ডার সার্ভার এবং রেকর্ডার দুটোরই gui থাকবে। যাতে ভিজুয়্যালি সব কিছু দেখা যায় যে কোন কোন কাজগুলো কোথায় কিভাবে কি হচ্ছে।
+
+ফ্যান্সি ডাটাবেজের প্রয়োজন নেই। রেন্ডার পিসিতে একটি sqlite ডাটাবেজ থাকবে যেখানে বেসিক হিসাবগুলো রাখবে। এবং সেই ডাটাগুলোই কোনোভাবে রেকর্ডার ইন্টারফেসে দেখতে পারলেই হবে। এখানে বাড়তি কিছু প্রয়োজন নেই। শুধু উভয় ইন্টারফেসে আগের ডাটার মধ্যে তারিখ বা টাইটেল বা ফাইলের নাম হিসেবে সার্চ করে কোয়েরির ফলাফল দেখতে পারলেই হবে। 
+
+ভিডিও বা ইমেজে টেক্সট সবসময় একই পজিশনে খুবই সুন্দর ও পরিচ্ছন্নভাবে লিখা থাকবে এমন নিশ্চয়তা দেয়া যায়। তার মানে হচ্ছে রেকর্ডার এন্ডে একটি ইমেজের মধ্যে ঠিক কোন অংশে টেক্সটা খুঁজে পাওয়া যাবে তেমন কোনো সেটিংস ভিজুয়্যালি নির্ধারণ করে দেয়ার ব্যবস্থা থাকতে হবে। 
+
+এক্ষেত্রে কি ধরণের ডাটাবেজ ব্যবহার করলে সুবিধা হবে। পুরো আর্কিটেকচার কী হবে। ইন্টারফেসে কি কি থাকবে। টেকনিক্যাল চ্যালেঞ্জ কোন কোন জায়গায় আছে। বিস্তারিত বিবরণসহ দাও। 
+
+---------
+Recorder PC ও Render PC আলাদা
+
+Shared folder ভিত্তিক file handoff
+
+SQLite only for basic metadata/history
+
+এতে system অকারণে enterprise-monster হবে না। তবে একটা কথা পরিষ্কার:
+এটা “একটা ভিডিও এডিটর” না, এটা “semi-real-time newsroom clipping and ad-insertion pipeline”।
+এই mindset নিয়ে design না করলে জিনিসটা ভেঙে পড়বে।
+
+আমি নিচে আপনার updated requirement অনুযায়ী পুরো system-টা production-minded ভাবে সাজিয়ে দিচ্ছি।
+
+১) সিস্টেমের মূল উদ্দেশ্য
+
+সিস্টেমের প্রধান কাজ হবে:
+
+লাইভ বা recorded long feed থেকে operator manually story boundary mark করবে
+
+story clip shared folder-এ save হবে
+
+selected ad set এবং overlay rules অনুযায়ী render queue তৈরি হবে
+
+render server clip নিয়ে ffmpeg দিয়ে final output বানাবে
+
+একই clip থেকে 20 frame extract হবে
+
+predefined crop region থেকে Bangla text OCR করা হবে
+
+OCR text দিয়ে folder/file rename হবে
+
+SQLite-এ title, date-time, path, status সংরক্ষণ হবে
+
+recorder GUI ও render GUI—দুটো থেকেই search/history দেখা যাবে
+
+আপনার requirement-এর ভাষায়:
+টিভিতে অন-এয়ার হওয়া নিউজ story কে ২–৩ মিনিটের মধ্যে ডিজিটাল upload-ready asset বানানো।
+
+২) আপনার updated decision অনুযায়ী best-fit architecture
+
+এখানে আমি simplest workable architecture দেব, যেটা overengineering না, আবার fragileও না।
+
+Core Components
+A. Recorder Application (WPF GUI)
+
+এখানে operator কাজ করবে।
+
+কাজ:
+
+source connect করা
+
+preview + audio monitoring
+
+manual record start/stop
+
+ad set select
+
+OCR crop region visually define
+
+previous processed stories search/view
+
+job submission status দেখা
+
+B. Render Server Application (WPF GUI + background worker)
+
+Render PC-তে চলবে।
+
+কাজ:
+
+shared folder scan করা / queue consume করা
+
+pending jobs দেখা
+
+ffmpeg render করা
+
+20 frame extract করা
+
+OCR চালানো
+
+final folder/file naming করা
+
+SQLite update করা
+
+logs/status দেখানো
+
+C. Shared Network Folder
+
+Recorder আর Render—দুই পিসিই access করবে।
+
+এখানে থাকবে:
+
+raw recorded clips
+
+ad sets
+
+overlays
+
+queue json/job files
+
+output videos
+
+extracted frames
+
+temp working files
+
+D. SQLite Database
+
+Render PC-তে থাকবে।
+
+এখানে থাকবে basic:
+
+processed items
+
+render jobs
+
+OCR text
+
+on-air date time
+
+output paths
+
+search history style metadata
+
+E. FFmpeg
+
+Render server-এ install থাকবে।
+Recorder-এও optional থাকতে পারে preview/recording backend হিসেবে।
+
+F. OCR Engine
+
+এই অংশ আলাদা module/service হিসেবে রাখা ভালো, কিন্তু first version-এ render app-এর ভিতরেও থাকতে পারে।
+
+৩) কেন SQLite এখানে acceptable
+
+আপনি ঠিক বলেছেন—এখানে “fancy database” লাগবে না।
+
+SQLite কেন এখানে ঠিক আছে
+
+কারণ:
+
+একটাই render machine write করবে
+
+database load খুব কম
+
+mostly metadata storage
+
+search simple
+
+network-distributed concurrent heavy write নেই
+
+full DB server maintain করার ঝামেলা নেই
+
+SQLite কোথায় risky
+
+SQLite খারাপ হত যদি:
+
+দুই মেশিন থেকেই direct concurrent write হতো
+
+অনেক worker parallel job নিত
+
+queue control purely DB locking দিয়ে multi-node scale করতেন
+
+heavy analytics/reporting থাকত
+
+কিন্তু আপনার use case-এ:
+
+render PC primary writer
+
+recorder GUI mostly read-only
+
+basic search যথেষ্ট
+
+তাই SQLite যথেষ্ট, তবে একটা শর্তে:
+
+গুরুত্বপূর্ণ শর্ত
+
+SQLite file shared folder-এ রাখবেন না।
+Database render PC-এর লোকাল ডিস্কে রাখবেন।
+
+Recorder GUI data দেখবে:
+
+render app expose করা lightweight API দিয়ে
+অথবা
+
+database snapshot / export json / replicated read file দিয়ে
+
+সবচেয়ে clean approach:
+
+Render PC-তে SQLite local থাকবে
+
+Render GUI + Recorder GUI দুইটিই একটি ছোট local HTTP API/IPC service থেকে data নেবে
+
+কিন্তু যদি API না চান, ultra-simple version:
+
+Recorder PC read-only mode-এ network path দিয়ে SQLite open করতে পারে
+তবে এটা ideal না। occasional read okay, কিন্তু robust না।
+
+Best practical choice:
+Render PC-তে local SQLite + small read API.
+
+৪) Recommended overall architecture
+
+এটা আমি আপনার জন্য cleanভাবে দিচ্ছি:
+
+[Recorder PC]
+  WPF Recorder GUI
+    ├─ Source Input Module
+    ├─ Preview/Audio Monitor
+    ├─ Manual Clip Recorder
+    ├─ Ad Set Selector
+    ├─ OCR Region Configurator
+    └─ History/Search Viewer
+
+          │
+          │ writes clip + job file
+          ▼
+
+[Shared Network Folder]
+  ├─ Ingest\RawClips\
+  ├─ Jobs\Pending\
+  ├─ Assets\AdSets\
+  ├─ Assets\Overlays\
+  ├─ Working\
+  ├─ Output\
+  └─ Frames\
+
+          │
+          ▼
+
+[Render PC]
+  WPF Render GUI
+    ├─ Queue Monitor
+    ├─ Job Processor Status
+    ├─ OCR Preview
+    ├─ Logs/Errors
+    └─ Search/History Viewer
+
+  Background Worker
+    ├─ Job Scanner
+    ├─ File Ready Checker
+    ├─ Frame Extraction
+    ├─ OCR Engine
+    ├─ FFmpeg Renderer
+    ├─ Output Organizer
+    └─ SQLite Writer
+
+  Local SQLite DB
+৫) Workflow end-to-end
+
+এখন পুরো process step by step:
+
+Stage 1: Source connection
+
+Recorder PC-তে source হবে ৩ ধরনের:
+
+Live feed
+যেমন Blackmagic / capture card input
+
+Local long video file
+যেমন ১ ঘন্টার recorded feed
+
+YouTube live/news link
+যেটা open করে ingest/preview করা যাবে
+
+Stage 2: Monitoring
+
+Operator headphone পরে ভিডিও শুনবে এবং preview window-তে দেখবে।
+
+এখানে দরকার:
+
+live video playback
+
+audio meter
+
+headphone volume control
+
+mute/unmute
+
+source health indicator
+
+Stage 3: Manual story clipping
+
+যখন presenter story শুরু করবে:
+
+Record Start
+
+যখন story + report part শেষ:
+
+Record Stop
+
+এর ফলে একটা clip complete হবে।
+
+Stage 4: Ad set selection
+
+Clip record করার সময় বা stop করার আগে/পরে operator একটা ad set বেছে দেবে।
+
+Ad set-এ থাকতে পারে:
+
+mid-roll TVC video
+
+overlay graphic
+
+insertion timing rules
+
+Stage 5: Raw clip save
+
+Raw clip shared folder-এ save হবে।
+
+উদাহরণ:
+
+\\MediaShare\Ingest\RawClips\2026-03-15\clip_20260315_201530.mp4
+Stage 6: Job creation
+
+Recorder app shared folder-এর Jobs\Pending\ এ একটি job file তৈরি করবে।
+
+উদাহরণ:
+
+{
+  "jobId": "JOB-20260315-00021",
+  "rawClipPath": "\\\\MediaShare\\Ingest\\RawClips\\2026-03-15\\clip_20260315_201530.mp4",
+  "sourceType": "LiveFeed",
+  "sourceName": "Channel 24",
+  "clipStart": "2026-03-15T20:15:30",
+  "clipEnd": "2026-03-15T20:17:02",
+  "adSet": "Set_A",
+  "overlaySet": "Overlay_Breaking",
+  "ocrProfile": "Channel24_Profile_1",
+  "submittedBy": "Operator01",
+  "submittedAt": "2026-03-15T20:17:04"
+}
+
+এই job file create হওয়াটাই queue submit।
+
+Stage 7: Render worker picks up
+
+Render app background worker pending jobs scan করবে।
+
+job detect করবে
+
+lock করবে
+
+processing শুরু করবে
+
+Stage 8: File ready check
+
+এই অংশ critical।
+
+Record stop হওয়ার সাথে সাথে clip file এসেছে মানেই process-ready না।
+কারণ file এখনও write complete নাও হতে পারে।
+
+তাই render worker:
+
+file exists check করবে
+
+file size stable আছে কি না check করবে
+
+optional: last modified time 2–5 sec unchanged আছে কি না check করবে
+
+তারপর processing শুরু করবে।
+
+Stage 9: 20 frames extraction
+
+একটা ffmpeg instance clip থেকে 20 frame extract করবে।
+
+এই frames যাবে:
+
+\\MediaShare\Working\JOB-20260315-00021\frames\
+
+অথবা পরে final folder-এ move হবে।
+
+Stage 10: OCR
+
+Extracted frame বা selected key frame থেকে predefined crop region কেটে OCR চালানো হবে।
+
+এখানে:
+
+crop region recorder side-এ visual config হিসেবে save থাকবে
+
+render worker সেই config ব্যবহার করবে
+
+OCR output থেকে:
+
+raw text
+
+normalized text
+
+confidence
+
+chosen best title
+
+Stage 11: Final render
+
+আরেকটি ffmpeg process:
+
+raw clip নেবে
+
+TVC insert করবে
+
+overlay বসাবে
+
+final encode করবে
+
+Stage 12: Output folder naming
+
+OCR থেকে title পাওয়ার পর final folder বানানো হবে:
+
+\\MediaShare\Output\2026-03-15\বাংলাদেশ_ব্যাংকের_নতুন_সিদ্ধান্ত\
+
+এর ভিতরে থাকবে:
+
+rendered video
+
+20 extracted frames
+
+metadata.json
+
+Stage 13: SQLite update
+
+তারপর SQLite-এ insert হবে:
+
+title
+
+raw clip path
+
+final output path
+
+on-air date-time
+
+processed time
+
+ad set
+
+source
+
+status
+
+Stage 14: GUI refresh
+
+Recorder GUI এবং Render GUI—দুই জায়গাতেই processed item দেখা যাবে।
+
+৬) Queue system কীভাবে হবে
+
+আপনার system-এ queue database-heavy হতে হবে না।
+এখানে file-based queue + SQLite tracking যথেষ্ট।
+
+Recommended queue structure
+Jobs\
+  Pending\
+  Processing\
+  Done\
+  Failed\
+Flow
+
+Recorder app job json file Pending-এ ফেলে
+
+Render worker সেটা detect করে Processing-এ move করে
+
+success হলে Done
+
+fail হলে Failed
+
+SQLite শুধু history/state log রাখবে।
+
+কেন এটা ভালো
+
+সহজ
+
+দৃশ্যমান
+
+debug করা সহজ
+
+operator-ও বুঝতে পারবে কি হচ্ছে
+
+DB corruption হলে jobs উধাও হবে না
+
+কেন pure SQLite queue না
+
+SQLite দিয়েও queue করা যায়, কিন্তু আপনার scale-এ file queue আরও intuitive।
+আর যেহেতু shared folder already আছে, এটা natural fit।
+
+আমার recommendation:
+Job file queue + SQLite metadata log
+
+৭) Database design — SQLite schema
+
+এখানে খুব জটিল schema লাগবে না।
+
+Table 1: ProcessedStories
+
+এই table-টাই সবচেয়ে important।
+
+Fields:
+
+Id
+
+JobId
+
+TitleRaw
+
+TitleNormalized
+
+SafeFolderName
+
+SourceType
+
+SourceName
+
+OnAirDateTime
+
+ClipStartTime
+
+ClipEndTime
+
+DurationSec
+
+AdSetName
+
+OverlaySetName
+
+RawClipPath
+
+OutputFolderPath
+
+OutputVideoPath
+
+FramesPath
+
+OcrConfidence
+
+CreatedAt
+
+ProcessedAt
+
+Status
+
+ErrorMessage
+
+Table 2: Jobs
+
+Fields:
+
+Id
+
+JobId
+
+SubmittedBy
+
+SubmittedAt
+
+Status
+
+CurrentStep
+
+RetryCount
+
+LastError
+
+UpdatedAt
+
+Table 3: OcrProfiles
+
+Fields:
+
+Id
+
+ProfileName
+
+SourceName
+
+CropX
+
+CropY
+
+CropWidth
+
+CropHeight
+
+ResizeScale
+
+ThresholdMode
+
+IsActive
+
+Table 4: AdSets
+
+Fields:
+
+Id
+
+AdSetName
+
+TvcPath
+
+OverlayPath
+
+InsertMode
+
+InsertAtSec
+
+OverlayStartSec
+
+OverlayEndSec
+
+IsActive
+
+Search support
+
+Index দিন:
+
+TitleNormalized
+
+OnAirDateTime
+
+SafeFolderName
+
+Status
+
+এতেই date/title/file search ঠিকমতো হবে।
+
+৮) OCR configuration — এটা আপনার system-এর সবচেয়ে sensitive অংশ
+
+আপনি বলেছেন text position visually নির্ধারণ করে দেওয়া যাবে।
+এটাই সঠিক approach।
+
+কারণ OCR hardcoded না রেখে configurable হওয়া চাই।
+
+Recorder GUI-তে OCR region setup কীভাবে থাকবে
+
+একটা “OCR Profile Editor” screen থাকবে।
+
+User flow
+
+source preview বা sample frame freeze করবে
+
+image-এর উপর rectangle draw করবে
+
+rectangle-টাই হবে OCR crop area
+
+save করবে profile হিসেবে
+
+Profile-এর components
+
+profile name
+
+source/channel name
+
+crop area
+
+preprocessing type
+
+scale factor
+
+test OCR button
+
+কেন এটা দরকার
+
+সব channel-এর lower third একই না।
+কখনও 1 line, কখনও 2 line
+কখনও ticker নিচে
+কখনও logo overlap
+
+তাই per-channel profile লাগবে।
+
+Better design
+
+প্রতি source/channel-এর জন্য multiple OCR profile রাখা যায়:
+
+headline region
+
+subheadline region
+
+emergency alternate region
+
+৯) OCR engine নিয়ে সোজা কথা
+
+এখানে বেশি hype খাওয়া যাবে না।
+
+বাস্তব অবস্থা
+
+Bangla OCR clean broadcast text-এ কাজ করতে পারে
+কিন্তু 100% perfect না।
+
+Risk factors
+
+glow/shadow
+
+anti-aliased text
+
+low bitrate compression
+
+interlaced feed
+
+moving graphic
+
+ticker collision
+
+text transition animation
+
+তাই কী করবেন
+
+Single frame OCR করবেন না।
+
+Correct approach:
+
+20 frame extract
+
+ওই crop area থেকে একাধিক frame-এ OCR চালান
+
+best/most repeated result নিন
+
+normalize করুন
+
+এটাকে আমি বলব multi-frame consensus OCR।
+
+Fallback policy লাগবে
+
+OCR fail করলে filename বানাতে fallback থাকতে হবে:
+
+Untitled_20260315_201530
+
+Story_Job00021
+
+এটা না রাখলে পুরো pipeline fail করবে।
+
+১০) FFmpeg rendering rules design
+
+FFmpeg এখানে ৩ কাজ করবে:
+
+A. Normalize input
+
+যদি source format ভিন্ন হয়:
+
+fps normalize
+
+resolution normalize
+
+audio normalize
+
+B. Insert TVC
+
+দুই rule হতে পারে:
+
+fixed timestamp
+
+clip midpoint
+
+C. Overlay bind
+
+PNG overlay
+
+alpha video overlay
+
+start/end controlled overlay
+
+D. Frame extraction
+
+20 still frame আলাদা output
+
+Ad set configuration file
+
+Shared folder-এ প্রতিটি ad set folder-এর ভিতরে config রাখা উচিত।
+
+উদাহরণ:
+
+{
+  "name": "Set_A",
+  "tvcFile": "tvc.mp4",
+  "overlayFile": "overlay.png",
+  "insertMode": "fixed",
+  "insertAtSec": 18,
+  "overlayStartSec": 0,
+  "overlayEndSec": 9999,
+  "outputWidth": 1920,
+  "outputHeight": 1080
+}
+
+এতে system hardcoded হবে না।
+
+১১) Shared folder structure
+
+এই structure না করলে পরে সব ফাইল গুলিয়ে যাবে।
+
+\\MediaShare\
+  Assets\
+    AdSets\
+      Set_A\
+        tvc.mp4
+        overlay.png
+        config.json
+      Set_B\
+    OcrProfiles\
+  Ingest\
+    RawClips\
+      2026-03-15\
+  Jobs\
+    Pending\
+    Processing\
+    Done\
+    Failed\
+  Working\
+    JOB-20260315-00021\
+  Output\
+    2026-03-15\
+      বাংলাদেশ_ব্যাংকের_নতুন_সিদ্ধান্ত\
+        final.mp4
+        metadata.json
+        frames\
+          001.jpg
+          002.jpg
+  Logs\
+১২) Recorder GUI-তে কী কী থাকবে
+
+আপনি বলেছেন recorder আর render—দুটোতেই GUI থাকবে।
+ঠিক। Recorder GUI operator-centric হবে।
+
+Recorder Main Screen
+Top bar
+
+source selector
+
+source status
+
+clock / current time
+
+current operator
+
+shared folder status
+
+Left panel
+
+source type:
+
+Live Feed
+
+Local File
+
+YouTube URL
+
+connect/disconnect button
+
+input settings
+
+Center
+
+large preview player
+
+current timecode
+
+audio level meter
+
+monitor volume
+
+headphone output control
+
+Right panel
+
+ad set list
+
+overlay set preview
+
+radio button selection
+
+selected config summary
+
+Bottom controls
+
+Record Start
+
+Record Stop
+
+Cancel Clip
+
+Mark Important
+
+Submit Job status
+
+current clip duration
+
+Lower table/grid
+
+recently processed stories
+
+search box
+
+filter by date/title/file name
+
+status color:
+
+completed
+
+rendering
+
+failed
+
+Recorder Settings Screen
+
+shared folder path
+
+source profiles
+
+OCR region editor
+
+file naming rules
+
+default ad set
+
+YouTube handling settings
+
+local clip save folder
+
+OCR Region Config Screen
+
+freeze frame preview
+
+draw/resize rectangle
+
+save profile
+
+test crop preview
+
+test OCR result
+
+১৩) Render GUI-তে কী কী থাকবে
+
+Render GUI operator/admin-centric হবে।
+
+Render Dashboard
+
+pending jobs count
+
+processing job
+
+completed today
+
+failed today
+
+render speed metrics
+
+Queue screen
+
+columns:
+
+JobId
+
+title if available
+
+source
+
+ad set
+
+status
+
+current step
+
+elapsed time
+
+error
+
+Job detail screen
+
+raw clip preview
+
+OCR crop preview
+
+extracted title
+
+frame thumbnails
+
+final output path
+
+ffmpeg command/log
+
+retry button
+
+Search/history screen
+
+title/date/file search
+
+open output folder
+
+open video
+
+show metadata
+
+Settings screen
+
+ffmpeg path
+
+OCR engine path
+
+temp folder
+
+output folder
+
+max concurrent renders
+
+cleanup rules
+
+১৪) Input source design
+
+আপনার ৩ input mode support করতে হবে, তবে এদের abstraction দরকার।
+
+Supported sources
+1. Live feed via capture card
+
+যেমন Blackmagic
+
+চ্যালেঞ্জ:
+
+SDK integration
+
+signal loss
+
+frame timing
+
+audio sync
+
+2. Local file playback
+
+এটা comparatively সহজ।
+
+Operator real-time play শুনে:
+
+record start
+
+record stop
+
+3. YouTube live/news URL
+
+এটা feasible, কিন্তু tricky।
+
+চ্যালেঞ্জ:
+
+stream URL resolution
+
+live stream disconnection
+
+buffering
+
+URL expiry
+
+Important design rule
+
+সব source-এর উপর common abstraction রাখুন:
+
+Preview
+
+Start record
+
+Stop record
+
+Current position
+
+Source health
+
+না হলে codebase জঞ্জাল হবে।
+
+১৫) Naming strategy
+
+OCR text দিয়ে folder/file name হবে—ঠিক আছে।
+কিন্তু raw OCR text directly filesystem-এ ঢোকাবেন না।
+
+তিন ধরনের title রাখুন
+1. Raw OCR text
+
+DB-তে original form
+
+2. Normalized display title
+
+UI-তে দেখানোর জন্য
+
+3. Safe file/folder name
+
+filesystem safe
+
+Example
+
+Raw:
+বাংলাদেশ ব্যাংকের নতুন নীতিমালা ঘোষণা
+
+Display:
+বাংলাদেশ ব্যাংকের নতুন নীতিমালা ঘোষণা
+
+Safe:
+বাংলাদেশ_ব্যাংকের_নতুন_নীতিমালা_ঘোষণা
+
+Sanitization rules
+
+invalid file chars remove
+
+multiple spaces collapse
+
+newline remove
+
+punctuation sanitize
+
+max length limit
+
+duplicate suffix add
+
+১৬) Search functionality
+
+আপনি বলেছেন date/title/file name দিয়ে search দরকার।
+এইটা simple এবং খুব useful।
+
+Search modes
+
+date range
+
+title contains
+
+file/folder name contains
+
+source/channel
+
+status
+
+Recorder GUI-তে use case
+
+operator check করতে পারবে:
+
+এই title আগে হয়েছে কি?
+
+আজকে already process হয়েছে কি?
+
+same story duplicate হচ্ছে কি?
+
+১৭) Technical challenges — আসল যুদ্ধ এখানেই
+
+এখন bluntভাবে বলি: system-এর সবচেয়ে বড় সমস্যা UI না, FFmpeg না—reliability।
+
+1. OCR reliability
+
+এটা সবথেকে fragile অংশ।
+
+কারণ:
+
+TV text style change হতে পারে
+
+animation থাকতে পারে
+
+crop perfect না হলে ভুল title
+
+Bangla ligature সমস্যা হতে পারে
+
+2. File-ready timing
+
+record stop-এর পরই render শুরু করতে চাইবেন
+কিন্তু file যদি এখনও flush না হয়, render fail করবে
+
+3. Audio sync
+
+capture source থেকে record এবং final render-এ audio drift হলে clip unusable লাগবে
+
+4. TVC insertion logic
+
+ad কোথায় ঢুকবে সেটা rule-based হতে হবে
+না হলে awkward cut হবে
+
+5. Overlay safe area
+
+overlay headline বা presenter face ঢেকে দিলে output trash হবে
+
+6. Render queue backlog
+
+একটার পর একটা clip এলে queue জমে যাবে
+২–৩ মিনিট target fail হতে পারে
+
+7. Shared folder instability
+
+network hiccup, permission issue, partial file copy
+
+8. YouTube input instability
+
+live URL break, stream switch, latency change
+
+9. Manual operator delay
+
+operator record start বা stop একটু late করলে clip imperfect হবে
+
+10. Duplicate title / same story updates
+
+একই headline multiple time আসতে পারে
+naming collision হবে
+
+১৮) এসব challenge সামলানোর practical solution
+OCR-এর জন্য
+
+multi-frame OCR
+
+profile-based crop region
+
+preprocess image
+
+fallback name
+
+manual rename option later add করা
+
+Queue-এর জন্য
+
+file-based queue folders
+
+lock file
+
+retry count
+
+failed folder
+
+job logs
+
+Render stability
+
+temp working directory per job
+
+temp output first
+
+final move only on success
+
+ffmpeg exit code capture
+
+stderr log save
+
+Network reliability
+
+shared folder health indicator
+
+file exists + stable size check
+
+retry backoff
+
+Naming collision
+
+same title হলে suffix দিন
+
+timestamp append
+
+jobId append
+
+১৯) SQLite access strategy — important
+
+আবার বলছি, এটা cleanভাবে করতে হবে।
+
+Best option
+
+Render PC-তে SQLite local থাকবে
+Render app একটি tiny local API expose করবে
+Recorder GUI ওই API থেকে history/search data নেবে
+
+এই API হতে পারে:
+
+ASP.NET Core minimal API
+
+localhost + LAN accessible small service
+
+Endpoints:
+
+/stories/search
+
+/jobs/recent
+
+/jobs/status/{id}
+
+Simpler but weaker option
+
+Recorder shared network path দিয়ে SQLite read করবে
+এটা কাজ করতে পারে, কিন্তু locking/availability issue হতে পারে
+
+আমি recommend করব small read API
+কারণ future-proof এবং stable।
+
+২০) Suggested development breakdown
+
+আপনি যদি সব একসাথে বানাতে যান, project নষ্ট হবে।
+এই order-এ বানান:
+
+Phase 1 — Core proof
+
+shared folder structure
+
+file-based queue
+
+raw clip -> ffmpeg render pipeline
+
+output folder creation
+
+SQLite insert
+
+Phase 2 — Recorder app basic
+
+local file source
+
+record start/stop
+
+ad set selection
+
+job submit
+
+Phase 3 — Render GUI
+
+queue monitor
+
+logs
+
+history search
+
+Phase 4 — OCR
+
+crop region editor
+
+Bangla OCR benchmark
+
+multi-frame consensus
+
+Phase 5 — live source integration
+
+capture card source
+
+signal monitoring
+
+audio monitoring
+
+Phase 6 — YouTube input
+
+URL input
+
+preview/record
+
+২১) Recommended module breakdown
+Recorder App Modules
+
+SourceManager
+
+PreviewPlayer
+
+RecordingController
+
+AdSetLoader
+
+JobCreator
+
+HistoryViewer
+
+OcrProfileEditor
+
+SettingsManager
+
+Render App Modules
+
+JobWatcher
+
+QueueManager
+
+FileReadyChecker
+
+FrameExtractionService
+
+OcrProcessor
+
+TitleNormalizer
+
+FfmpegRenderService
+
+OutputOrganizer
+
+SqliteRepository
+
+LogService
+
+২২) Technology stack recommendation
+
+আপনার stated stack অনুযায়ী:
+
+UI
+
+C# .NET 8
+
+WPF
+
+MVVM
+
+Material Design in XAML Toolkit
+
+Media / processing
+
+FFmpeg
+
+FFprobe
+
+optional yt-dlp for YouTube source helper
+
+Database
+
+SQLite
+
+Config
+
+JSON files
+
+Logging
+
+Serilog
+
+Inter-process
+
+shared folder + json jobs
+
+optional minimal API for DB read
+
+২৩) Minimum viable database recommendation
+
+আপনি জিজ্ঞেস করেছেন “কি ধরণের ডাটাবেজ সুবিধা হবে”।
+
+আমার final answer:
+
+Use:
+
+SQLite
+
+But with these rules:
+
+render PC local disk-এ রাখুন
+
+recorder থেকে direct heavy write করবেন না
+
+DB শুধু metadata/history/log index হিসেবে ব্যবহার করুন
+
+queue primary mechanism হিসেবে DB না, job files use করুন
+
+এটাই আপনার system-এর জন্য best balance।
+
+২৪) Final architecture recommendation
+
+সবকিছু মিলিয়ে আমি যেটা approve করব সেটা হলো:
+
+Final architecture
+
+Recorder PC
+
+WPF GUI
+
+source preview/record
+
+manual story clipping
+
+ad set selection
+
+OCR region visual setup
+
+history/search view
+
+Shared Folder
+
+raw clips
+
+assets
+
+queue job files
+
+outputs
+
+temp working files
+
+Render PC
+
+WPF GUI
+
+background worker
+
+ffmpeg rendering
+
+frame extraction
+
+OCR
+
+file/folder naming
+
+SQLite metadata store
+
+SQLite
+
+local to render PC
+
+store processed titles, paths, date-time, status
+
+recorder GUI gets read access via API or controlled read mechanism
+
+২৫) সবচেয়ে critical design decisions
+
+এই ৮টা decision ঠিকভাবে নিলে project দাঁড়াবে:
+
+Queue হবে job file based
+
+DB হবে SQLite এবং শুধু metadata store
+
+OCR হবে profile-based crop region + multi-frame
+
+Recorder এবং Render আলাদা executable
+
+Shared folder structure কঠোরভাবে define করতে হবে
+
+Final naming raw OCR text থেকে normalize করে করতে হবে
+
+Render শুরু করার আগে file-ready check লাগবে
+
+GUI-তে search/history/diagnostics অবশ্যই থাকবে
+
+২৬) ruthless verdict
+
+আইডিয়াটা workable।
+কিন্তু একটাই জায়গায় project ভেঙে যাওয়ার সম্ভাবনা সবচেয়ে বেশি:
+
+Bangla OCR + reliable title naming
+
+বাকি সব engineering.
+এটা হচ্ছে real uncertainty.
+
+তাই শুরুতেই সুন্দর UI বানাতে গেলে সেটা ভুল হবে।
+প্রথমে proof লাগবে এই তিনটার:
+
+real footage থেকে stable clip extraction
+
+ffmpeg render time acceptable কি না
+
+Bangla OCR enough reliable কি না
+
+এই তিনটার prototype না করলে পুরো project presentation-level থাকবে, production-level হবে না।
+
+
+পুরো আইডিয়ার ওপর ভিত্তি করে মোট দুটি সফটওয়্যার তৈরি হবে। রেন্ডার এবং রেকর্ডার ইন্টারফেস। এই সফটওয়্যারগুলো তৈরির জন্য দুটি md ফাইলের ফেইজ বাই ফেইজ প্লান তৈরি করো। যেটাকে অনুসরণ করে ধারাবাহিকভাবে একটার পর একটা ফিচার তৈরি করবো। যথা সম্ভব ডিটেইল করে তৈরি করতে হবে।

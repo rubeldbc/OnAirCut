@@ -1,0 +1,23 @@
+{
+  "sharedFolderPath": "",
+  "ffmpegPath": "lib/ffmpeg/ffmpeg.exe",
+  "ffprobePath": "lib/ffmpeg/ffprobe.exe",
+  "ocrEnginePath": "lib/tessdata",
+  "ocrLanguage": "ben",
+  "localDatabasePath": "AppData/onaircut.db",
+  "tempWorkingFolder": "",
+  "maxConcurrentRenders": 1,
+  "jobPollIntervalMs": 2000,
+  "fileReadyCheckIntervalMs": 1000,
+  "fileReadyStableSeconds": 3,
+  "outputVideoCodec": "libx264",
+  "outputVideoPreset": "fast",
+  "outputVideoCrf": 18,
+  "outputAudioCodec": "aac",
+  "outputAudioBitrate": "192k",
+  "cleanupWorkingFolderAfterDays": 7,
+  "frameExtractionCount": 20,
+  "ocrMultiFrameCount": 5,
+  "apiPort": 5123,
+  "apiEnabled": true
+}

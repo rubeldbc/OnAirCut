@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>OnAirCut.Recorder</RootNamespace>
+    <AssemblyName>OnAirCut.Recorder</AssemblyName>
+    <ApplicationIcon>Resources\app.ico</ApplicationIcon>
+    <Version>1.0.0</Version>
+    <Description>OnAirCut Recorder - News Clip Recording and Job Submission</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OnAirCut.Core\OnAirCut.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MaterialDesignThemes" Version="5.*" />
+    <PackageReference Include="MaterialDesignColors" Version="5.*" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.*" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.*" />
+    <PackageReference Include="LibVLCSharp" Version="3.*" />
+    <PackageReference Include="LibVLCSharp.WPF" Version="3.*" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.*" />
+    <PackageReference Include="NAudio" Version="2.*" />
+    <PackageReference Include="CliWrap" Version="3.*" />
+    <PackageReference Include="Tesseract" Version="5.*" />
+    <PackageReference Include="Serilog" Version="4.*" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\app.ico" />
+    <Resource Include="Resources\Fonts\NotoSansBengali-Regular.ttf" />
+  </ItemGroup>
+
+  <!-- Copy lib/ folder (ffmpeg, tessdata) to output directory -->
+  <ItemGroup>
+    <None Include="lib\**\*" CopyToOutputDirectory="PreserveNewest" LinkBase="lib" />
+  </ItemGroup>
+
+  <!-- Copy settings.json to output directory -->
+  <ItemGroup>
+    <None Include="settings.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,39 @@
+# Build outputs
+**/bin/
+**/obj/
+**/publish/
+**/publish_portable/
+
+# User settings
+**/*.user
+**/.vs/
+
+# Temp files
+**/temp/
+*.tmp
+
+# Large binary dependencies (download via app's Dependency Manager)
+**/lib/ffmpeg/
+**/lib/python/
+**/lib/yt-dlp/
+**/lib/tessdata/
+**/lib/ocr/models/
+
+# Keep the OCR scripts
+!**/lib/ocr/ocr_server.py
+!**/lib/ocr/ocr_engine.py
+
+# NuGet packages (restored on build)
+**/packages/
+
+# OS files
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# IDE
+.idea/
+*.suo
+*.sln.docstates
+Primary_Thinking.txt
+**/AppData/

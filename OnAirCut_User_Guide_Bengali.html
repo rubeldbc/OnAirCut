@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OnAirCut - ব্যবহারকারী নির্দেশিকা</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans Bengali', 'Kalpurush', 'SolaimanLipi', sans-serif;
+    font-size: 12pt;
+    line-height: 1.8;
+    color: #222;
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 15mm;
+    background: #fff;
+  }
+
+  h1 {
+    font-size: 26pt;
+    color: #1565C0;
+    text-align: center;
+    border-bottom: 3px solid #1565C0;
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 13pt;
+    color: #555;
+    margin-bottom: 30px;
+  }
+
+  h2 {
+    font-size: 18pt;
+    color: #1565C0;
+    margin-top: 30px;
+    margin-bottom: 12px;
+    border-left: 5px solid #1565C0;
+    padding-left: 12px;
+    page-break-after: avoid;
+  }
+
+  h3 {
+    font-size: 14pt;
+    color: #00897B;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    page-break-after: avoid;
+  }
+
+  h4 {
+    font-size: 12pt;
+    color: #E65100;
+    margin-top: 14px;
+    margin-bottom: 6px;
+  }
+
+  p { margin-bottom: 10px; }
+
+  ul, ol {
+    margin-left: 24px;
+    margin-bottom: 12px;
+  }
+
+  li { margin-bottom: 6px; }
+
+  .highlight {
+    background: #E3F2FD;
+    padding: 12px 16px;
+    border-radius: 6px;
+    border-left: 4px solid #1565C0;
+    margin: 14px 0;
+  }
+
+  .warning {
+    background: #FFF3E0;
+    padding: 12px 16px;
+    border-radius: 6px;
+    border-left: 4px solid #E65100;
+    margin: 14px 0;
+  }
+
+  .server-section h2 {
+    color: #00897B;
+    border-left-color: #00897B;
+  }
+
+  .server-section .highlight {
+    background: #E0F2F1;
+    border-left-color: #00897B;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 11pt;
+  }
+
+  th {
+    background: #1565C0;
+    color: white;
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .server-section th { background: #00897B; }
+
+  td {
+    padding: 7px 12px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  tr:nth-child(even) { background: #f9f9f9; }
+
+  .key {
+    display: inline-block;
+    background: #333;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10pt;
+    font-family: Consolas, monospace;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-size: 10pt;
+    font-weight: 600;
+  }
+
+  .btn-red { background: #EF5350; color: white; }
+  .btn-green { background: #66BB6A; color: white; }
+  .btn-orange { background: #FFA726; color: white; }
+  .btn-blue { background: #42A5F5; color: white; }
+  .btn-teal { background: #26A69A; color: white; }
+
+  .page-break { page-break-before: always; }
+
+  .toc { margin: 20px 0 30px 0; }
+  .toc a { color: #1565C0; text-decoration: none; }
+  .toc li { margin-bottom: 4px; }
+
+  .flow-diagram {
+    background: #f5f5f5;
+    padding: 16px;
+    border-radius: 8px;
+    font-family: Consolas, monospace;
+    font-size: 10pt;
+    line-height: 1.6;
+    margin: 14px 0;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 2px solid #ddd;
+    font-size: 10pt;
+    color: #888;
+  }
+</style>
+</head>
+<body>
+
+<h1>OnAirCut</h1>
+<p class="subtitle">নিউজরুম ক্লিপিং এবং বিজ্ঞাপন সংযোজন পাইপলাইন<br>সম্পূর্ণ ব্যবহারকারী নির্দেশিকা (বাংলা)</p>
+
+<div class="toc">
+<h3>সূচিপত্র</h3>
+<ol>
+  <li><a href="#overview">সিস্টেম পরিচিতি</a></li>
+  <li><a href="#install">ইনস্টলেশন ও সেটআপ</a></li>
+  <li><a href="#recorder">OnAirCut Recorder — বিস্তারিত নির্দেশিকা</a></li>
+  <li><a href="#server">OnAirCut Render Server — বিস্তারিত নির্দেশিকা</a></li>
+  <li><a href="#workflow">কর্মপ্রবাহ (Workflow)</a></li>
+  <li><a href="#shortcuts">কীবোর্ড শর্টকাট</a></li>
+  <li><a href="#troubleshooting">সমস্যা সমাধান</a></li>
+</ol>
+</div>
+
+<!-- ==================== SECTION 1 ==================== -->
+<h2 id="overview">১. সিস্টেম পরিচিতি</h2>
+
+<p>OnAirCut হচ্ছে একটি সেমি-রিয়েলটাইম নিউজরুম ক্লিপিং এবং বিজ্ঞাপন সংযোজন সিস্টেম। এটি দুটি আলাদা সফটওয়্যার নিয়ে গঠিত:</p>
+
+<table>
+  <tr><th>সফটওয়্যার</th><th>কাজ</th><th>কোথায় চলবে</th></tr>
+  <tr><td><strong>OnAirCut Recorder</strong></td><td>লাইভ/রেকর্ডেড নিউজ ফিড মনিটর করা, স্টোরি ক্লিপ করা, বিজ্ঞাপন সেট নির্বাচন, জব সাবমিট</td><td>রেকর্ডার পিসি</td></tr>
+  <tr><td><strong>OnAirCut Render Server</strong></td><td>স্বয়ংক্রিয়ভাবে ক্লিপ প্রসেস: বিজ্ঞাপন সহ রেন্ডার, ফ্রেম এক্সট্রাক্ট, OCR দিয়ে ফাইলের নামকরণ</td><td>রেন্ডার পিসি</td></tr>
+</table>
+
+<div class="highlight">
+<strong>মূল উদ্দেশ্য:</strong> টিভিতে অন-এয়ার হওয়া নিউজ স্টোরি ২-৩ মিনিটের মধ্যে ডিজিটাল প্ল্যাটফর্মে (ইউটিউব, ফেসবুক, টিকটক) আপলোড-রেডি ভিডিও হিসেবে তৈরি করা।
+</div>
+
+<h3>সিস্টেম আর্কিটেকচার</h3>
+<div class="flow-diagram">[রেকর্ডার পিসি]                         [রেন্ডার পিসি]
+  OnAirCut Recorder                    OnAirCut Render Server
+       │                                      │
+       │         শেয়ারড ফোল্ডার               │
+       ├──────── (\\MediaShare) ──────────────┤
+       │   ক্লিপ, জব, বিজ্ঞাপন, আউটপুট        │
+       │                                      │
+       │       HTTP API (পোর্ট ৫১২৩)          │
+       └─────── হিস্ট্রি/সার্চ ←──────────────┘</div>
+
+<!-- ==================== SECTION 2 ==================== -->
+<h2 id="install" class="page-break">২. ইনস্টলেশন ও সেটআপ</h2>
+
+<h3>২.১ প্রয়োজনীয় জিনিস</h3>
+<ul>
+  <li><strong>অপারেটিং সিস্টেম:</strong> Windows 10/11 (64-bit)</li>
+  <li><strong>.NET 8 Runtime:</strong> dotnet.microsoft.com থেকে ডাউনলোড করুন</li>
+  <li><strong>শেয়ারড নেটওয়ার্ক ফোল্ডার:</strong> উভয় পিসি থেকে অ্যাক্সেসযোগ্য</li>
+</ul>
+
+<h3>২.২ ইনস্টলেশন ধাপসমূহ</h3>
+
+<h4>ধাপ ১: শেয়ারড ফোল্ডার তৈরি</h4>
+<p>উভয় পিসি থেকে অ্যাক্সেসযোগ্য একটি নেটওয়ার্ক শেয়ারড ফোল্ডার তৈরি করুন। যেমন: <code>\\MediaServer\OnAirCut</code></p>
+
+<h4>ধাপ ২: Recorder ইনস্টল (অপারেটর পিসি)</h4>
+<ol>
+  <li><code>OnAirCut Recorder</code> ফোল্ডারটি রেকর্ডার পিসিতে কপি করুন</li>
+  <li><code>OnAirCut.Recorder.exe</code> চালান</li>
+  <li>Settings-এ গিয়ে Shared Folder পাথ সেট করুন</li>
+  <li>"Create Folder Structure" বাটনে ক্লিক করুন — সব সাবফোল্ডার স্বয়ংক্রিয়ভাবে তৈরি হবে</li>
+</ol>
+
+<h4>ধাপ ৩: Render Server ইনস্টল (রেন্ডার পিসি)</h4>
+<ol>
+  <li><code>OnAirCut Server</code> ফোল্ডারটি রেন্ডার পিসিতে কপি করুন</li>
+  <li><code>OnAirCut.RenderServer.exe</code> চালান</li>
+  <li>Settings-এ একই Shared Folder পাথ সেট করুন</li>
+</ol>
+
+<h4>ধাপ ৪: বিজ্ঞাপন সেট তৈরি</h4>
+<p>শেয়ারড ফোল্ডারে বিজ্ঞাপন সেট ফোল্ডার তৈরি করুন:</p>
+<div class="flow-diagram">\\MediaShare\Assets\AdSets\
+  Set_A\
+    tvc.mp4              ← ৬-১০ সেকেন্ডের TVC ভিডিও
+    overlay.png          ← ১৯২০x১০৮০ স্বচ্ছ PNG ওভারলে
+    overlay.mov          ← অথবা স্বচ্ছ MOV ভিডিও ওভারলে
+    config.json          ← বিজ্ঞাপন সেট কনফিগারেশন</div>
+
+<h3>২.৩ শেয়ারড ফোল্ডার স্ট্রাকচার</h3>
+<p>"Create Folder Structure" বাটনে ক্লিক করলে নিচের সব ফোল্ডার স্বয়ংক্রিয়ভাবে তৈরি হয়:</p>
+<table>
+  <tr><th>ফোল্ডার</th><th>কাজ</th></tr>
+  <tr><td>Assets\AdSets\</td><td>বিজ্ঞাপন সেট (TVC + ওভারলে + কনফিগ)</td></tr>
+  <tr><td>Assets\OcrProfiles\</td><td>OCR ক্রপ রিজিয়ন প্রোফাইল</td></tr>
+  <tr><td>Ingest\RawClips\</td><td>রেকর্ড করা কাঁচা ক্লিপ (তারিখ অনুযায়ী)</td></tr>
+  <tr><td>Jobs\Pending\</td><td>নতুন জব কিউ</td></tr>
+  <tr><td>Jobs\Processing\</td><td>বর্তমানে প্রসেস হচ্ছে</td></tr>
+  <tr><td>Jobs\Done\</td><td>সম্পন্ন জব</td></tr>
+  <tr><td>Jobs\Failed\</td><td>ব্যর্থ জব</td></tr>
+  <tr><td>Working\</td><td>রেন্ডারের অস্থায়ী কর্মক্ষেত্র</td></tr>
+  <tr><td>Output\</td><td>চূড়ান্ত আউটপুট (তারিখ ও শিরোনাম অনুযায়ী)</td></tr>
+  <tr><td>Logs\</td><td>শেয়ারড লগ ফাইল</td></tr>
+</table>
+
+<!-- ==================== SECTION 3 ==================== -->
+<h2 id="recorder" class="page-break">৩. OnAirCut Recorder — বিস্তারিত নির্দেশিকা</h2>
+
+<h3>৩.১ মূল ইন্টারফেস বিবরণ</h3>
+<p>রেকর্ডার অ্যাপটি ফুলস্ক্রিনে খুলবে। ইন্টারফেসটি নিচের অংশগুলো নিয়ে গঠিত:</p>
+
+<h4>টাইটেল বার (সবার উপরে)</h4>
+<table>
+  <tr><th>উপাদান</th><th>বিবরণ</th></tr>
+  <tr><td>⚙️ সেটিংস বাটন</td><td>সেটিংস পেজ খুলে/বন্ধ করে</td></tr>
+  <tr><td>🟢/🔴 শেয়ারড ফোল্ডার স্ট্যাটাস</td><td>সবুজ = সংযুক্ত, লাল = সংযোগ বিচ্ছিন্ন</td></tr>
+  <tr><td>📹 সোর্স স্ট্যাটাস</td><td>বর্তমান ভিডিও সোর্সের নাম ও ধরন</td></tr>
+  <tr><td>🕐 ঘড়ি</td><td>বর্তমান সময় (রিয়েলটাইম আপডেট)</td></tr>
+</table>
+
+<h4>বাম প্যানেল — সোর্স প্যানেল</h4>
+<p>ভিডিও সোর্স নির্বাচন এবং সংযোগের জন্য এই প্যানেল ব্যবহৃত হয়।</p>
+<table>
+  <tr><th>উপাদান</th><th>বিবরণ</th></tr>
+  <tr><td><strong>Live Feed</strong> রেডিও বাটন</td><td>ক্যাপচার কার্ড (Blackmagic ইত্যাদি) থেকে লাইভ ফিড</td></tr>
+  <tr><td><strong>Local File</strong> রেডিও বাটন</td><td>আগে রেকর্ড করা ভিডিও ফাইল প্লে করে ক্লিপ করা</td></tr>
+  <tr><td><strong>YouTube URL</strong> রেডিও বাটন</td><td>ইউটিউব লাইভ স্ট্রিম URL দিয়ে সংযোগ</td></tr>
+  <tr><td>📁 ব্রাউজ বাটন</td><td>লোকাল ফাইল নির্বাচনের জন্য (শুধু Local File মোডে)</td></tr>
+  <tr><td>URL ইনপুট বক্স</td><td>ইউটিউব URL পেস্ট করার জন্য (শুধু YouTube মোডে)</td></tr>
+  <tr><td>ডিভাইস ড্রপডাউন</td><td>ক্যাপচার ডিভাইস নির্বাচন (শুধু Live Feed মোডে)</td></tr>
+  <tr><td>🟢 সংযোগ স্ট্যাটাস</td><td>সবুজ = সংযুক্ত, লাল = বিচ্ছিন্ন</td></tr>
+  <tr><td><span class="btn btn-blue">Connect</span> বাটন</td><td>নির্বাচিত সোর্সে সংযোগ করে</td></tr>
+  <tr><td><span class="btn btn-red">Disconnect</span> বাটন</td><td>সংযোগ বিচ্ছিন্ন করে</td></tr>
+</table>
+
+<h4>কেন্দ্রীয় প্যানেল — ভিডিও প্রিভিউ</h4>
+<table>
+  <tr><th>উপাদান</th><th>বিবরণ</th></tr>
+  <tr><td>ভিডিও প্রিভিউ এরিয়া</td><td>সংযুক্ত সোর্সের লাইভ ভিডিও দেখায়</td></tr>
+  <tr><td>VU মিটার (ডান পাশে)</td><td>অডিও লেভেল দেখায় (সবুজ/হলুদ/লাল গ্রেডিয়েন্ট)</td></tr>
+  <tr><td>টাইমকোড (নিচে বাম)</td><td>বর্তমান প্লেব্যাক পজিশন (HH:MM:SS)</td></tr>
+  <tr><td>সিক বার</td><td>ভিডিওতে যেকোনো পজিশনে যেতে টেনে আনুন (শুধু লোকাল ফাইলে)</td></tr>
+  <tr><td>▶️ প্লে/পজ বাটন</td><td>ভিডিও চালু/বন্ধ করে</td></tr>
+  <tr><td>Speed: 0.5x, 1x, 1.5x, 2x</td><td>প্লেব্যাক গতি পরিবর্তন (শুধু লোকাল ফাইলে)</td></tr>
+  <tr><td>🔊 ভলিউম স্লাইডার</td><td>অডিও ভলিউম নিয়ন্ত্রণ</td></tr>
+  <tr><td>🔇 মিউট বাটন</td><td>অডিও মিউট/আনমিউট</td></tr>
+</table>
+
+<h4>রেকর্ডিং কন্ট্রোল বার (প্রিভিউর নিচে)</h4>
+<table>
+  <tr><th>বাটন</th><th>রং</th><th>কাজ</th></tr>
+  <tr><td><span class="btn btn-red">● Record</span></td><td>লাল</td><td>রেকর্ডিং শুরু করে। প্রেজেন্টার স্টোরি পড়া শুরু করলে চাপুন।</td></tr>
+  <tr><td><span class="btn btn-red">■ Stop</span></td><td>কমলা</td><td>রেকর্ডিং বন্ধ করে। স্টোরি ও রিপোর্ট শেষ হলে চাপুন।</td></tr>
+  <tr><td><span class="btn btn-orange">T Capture Text</span></td><td>কমলা</td><td>স্ক্রিন থেকে টেক্সট ক্যাপচার করে (OCR)। বিস্তারিত নিচে।</td></tr>
+  <tr><td>✕ Cancel</td><td>লাল</td><td>বর্তমান রেকর্ডিং বাতিল করে</td></tr>
+  <tr><td>REC ইন্ডিকেটর</td><td>লাল পালসিং</td><td>রেকর্ডিং চলছে নির্দেশ করে</td></tr>
+  <tr><td>সময় প্রদর্শন</td><td>—</td><td>রেকর্ডিং এলাপ্সড টাইম দেখায়</td></tr>
+  <tr><td>পেন্ডিং ব্যাজ</td><td>নীল</td><td>কতগুলো ক্লিপ সাবমিটের অপেক্ষায় আছে</td></tr>
+</table>
+
+<h4>ডান প্যানেল — বিজ্ঞাপন সেট ও পেন্ডিং ক্লিপ</h4>
+<table>
+  <tr><th>উপাদান</th><th>বিবরণ</th></tr>
+  <tr><td><strong>No Ad</strong> অপশন</td><td>কোনো বিজ্ঞাপন ছাড়া ক্লিপ সাবমিট</td></tr>
+  <tr><td>বিজ্ঞাপন সেট কার্ড</td><td>প্রতিটি কার্ডে TVC ফাইল, ওভারলে, ইনসার্ট মোড দেখায়</td></tr>
+  <tr><td>পেন্ডিং ক্লিপ তালিকা</td><td>রেকর্ড করা কিন্তু সাবমিট হয়নি এমন ক্লিপের তালিকা</td></tr>
+  <tr><td><span class="btn btn-green">▶ Submit</span></td><td>একটি ক্লিপ সাবমিট করে</td></tr>
+  <tr><td><span class="btn btn-green">Submit All</span></td><td>সব পেন্ডিং ক্লিপ একসাথে সাবমিট</td></tr>
+  <tr><td>🗑️ ডিলিট</td><td>পেন্ডিং ক্লিপ মুছে ফেলে</td></tr>
+</table>
+
+<h4>নিচের প্যানেল — হিস্ট্রি</h4>
+<table>
+  <tr><th>উপাদান</th><th>বিবরণ</th></tr>
+  <tr><td>🔍 সার্চ বক্স</td><td>শিরোনাম দিয়ে খুঁজুন</td></tr>
+  <tr><td>তারিখ ফিল্টার (From/To)</td><td>তারিখ পরিসর নির্বাচন</td></tr>
+  <tr><td>স্ট্যাটাস ফিল্টার</td><td>Pending/Processing/Completed/Failed দিয়ে ফিল্টার</td></tr>
+  <tr><td><span class="btn btn-blue">Search</span></td><td>ফিল্টার প্রয়োগ করে</td></tr>
+  <tr><td><span class="btn btn-blue">Clear</span></td><td>সব ফিল্টার মুছে ফেলে</td></tr>
+  <tr><td>ডেটা গ্রিড</td><td>প্রসেস করা স্টোরির তালিকা — Title, Date, Duration, Source, Ad Set, Status</td></tr>
+</table>
+
+<div class="highlight">
+<strong>স্ট্যাটাস রং:</strong> 🔵 নীল = Pending (অপেক্ষায়), 🟡 হলুদ = Processing (প্রসেসিং), 🟢 সবুজ = Completed (সম্পন্ন), 🔴 লাল = Failed (ব্যর্থ)
+</div>
+
+<!-- ==================== CAPTURE TEXT ==================== -->
+<h3 class="page-break">৩.২ Capture Text ফিচার — বিস্তারিত</h3>
+
+<p><span class="btn btn-orange">T Capture Text</span> বাটনটি রেকর্ড বাটনের পাশে অবস্থিত। এটি লাইভ ভিডিও থেকে বাংলা টেক্সট ক্যাপচার করে।</p>
+
+<h4>রেকর্ডিং চলাকালীন Capture Text চাপলে:</h4>
+<ol>
+  <li>স্ক্রিন থেকে একটি স্ক্রিনশট নেয়া হয়</li>
+  <li>সেটিংসে কনফিগার করা OCR এরিয়া থেকে টেক্সট বের করা হয়</li>
+  <li>ক্যাপচার করা টেক্সট স্ক্রিনে দেখানো হয় (কমলা রঙে)</li>
+  <li><strong>প্রথম ক্যাপচার করা টেক্সট</strong> ভিডিও ফাইলের নাম হিসেবে ব্যবহৃত হবে</li>
+  <li>একাধিক বার Capture Text চাপলে সব টেক্সট সংগ্রহ করা হয়</li>
+  <li>রেকর্ডিং বন্ধ হলে:
+    <ul>
+      <li>ভিডিও ফাইল প্রথম টেক্সট দিয়ে রিনেম হয় (যেমন: <code>বাংলাদেশ_ব্যাংকের_নতুন_নীতি.mp4</code>)</li>
+      <li>একই নামে একটি .txt ফাইল তৈরি হয় (যেমন: <code>বাংলাদেশ_ব্যাংকের_নতুন_নীতি.txt</code>)</li>
+      <li>.txt ফাইলে সব ক্যাপচার করা টেক্সট থাকে (প্রতিটি লাইনে একটি)</li>
+      <li>উভয় ফাইল একই ফোল্ডারে থাকে</li>
+    </ul>
+  </li>
+</ol>
+
+<h4>রেকর্ডিং না চলাকালীন Capture Text চাপলে:</h4>
+<ol>
+  <li>স্ক্রিন থেকে স্ক্রিনশট ও OCR করা হয়</li>
+  <li>ক্যাপচার করা টেক্সট দিয়ে একটি .txt ফাইল তৈরি হয়</li>
+  <li>ফাইলের নাম = ক্যাপচার করা টেক্সট (যেমন: <code>সংবিধান_সংস্কার.txt</code>)</li>
+  <li>ফাইলটি শেয়ারড ফোল্ডারের <code>Output/{তারিখ}/</code> তে সেভ হয়</li>
+  <li>প্রতিটি ক্যাপচারে আলাদা আলাদা .txt ফাইল তৈরি হয়</li>
+</ol>
+
+<!-- ==================== SETTINGS ==================== -->
+<h3 class="page-break">৩.৩ Recorder সেটিংস — প্রতিটি ট্যাবের বিবরণ</h3>
+
+<p>সেটিংস পেজে যেতে টাইটেল বারের ⚙️ (গিয়ার) আইকনে ক্লিক করুন। পেছনে ফিরতে ← (ব্যাক) বাটনে ক্লিক করুন।</p>
+
+<h4>ট্যাব ১: General (সাধারণ)</h4>
+<table>
+  <tr><th>সেটিং</th><th>বিবরণ</th></tr>
+  <tr><td>Operator Name</td><td>অপারেটরের নাম। জব সাবমিশনে ব্যবহৃত হয়।</td></tr>
+  <tr><td>Render Server API URL</td><td>রেন্ডার সার্ভারের API ঠিকানা। যেমন: http://192.168.1.10:5123</td></tr>
+  <tr><td>Auto-submit on recording stop</td><td>চেক করলে রেকর্ডিং বন্ধ হলে স্বয়ংক্রিয়ভাবে জব সাবমিট হবে</td></tr>
+</table>
+
+<h4>ট্যাব ২: Shared Folder (শেয়ারড ফোল্ডার)</h4>
+<table>
+  <tr><th>সেটিং</th><th>বিবরণ</th></tr>
+  <tr><td>Shared Folder Path</td><td>শেয়ারড নেটওয়ার্ক ফোল্ডারের পাথ। যেমন: \\MediaServer\OnAirCut</td></tr>
+  <tr><td>📁 Browse বাটন</td><td>ফোল্ডার ব্রাউজ করে নির্বাচন করুন</td></tr>
+  <tr><td><span class="btn btn-teal">Create Folder Structure</span></td><td>প্রয়োজনীয় সব সাবফোল্ডার স্বয়ংক্রিয়ভাবে তৈরি করে</td></tr>
+  <tr><td><span class="btn btn-blue">Validate</span></td><td>ফোল্ডার স্ট্রাকচার যাচাই করে — প্রতিটি ফোল্ডারের পাশে ✅ বা ❌ দেখায়</td></tr>
+  <tr><td>ফোল্ডার তালিকা</td><td>প্রতিটি প্রয়োজনীয় সাবফোল্ডারের অবস্থা দেখায়</td></tr>
+</table>
+
+<div class="warning">
+<strong>গুরুত্বপূর্ণ:</strong> প্রথমবার ব্যবহারের আগে অবশ্যই Shared Folder Path সেট করুন এবং "Create Folder Structure" ক্লিক করুন। এটি ছাড়া সিস্টেম কাজ করবে না।
+</div>
+
+<h4>ট্যাব ৩: Recording (রেকর্ডিং)</h4>
+<table>
+  <tr><th>সেটিং</th><th>বিবরণ</th></tr>
+  <tr><td>Recording Format</td><td>আউটপুট ফরম্যাট। ডিফল্ট: mp4</td></tr>
+  <tr><td>Recording Codec</td><td>ভিডিও কোডেক। ডিফল্ট: libx264</td></tr>
+  <tr><td>FFmpeg Path</td><td>FFmpeg এক্সিকিউটেবলের পাথ। ডিফল্ট: lib/ffmpeg/ffmpeg.exe</td></tr>
+  <tr><td>yt-dlp Path</td><td>yt-dlp এক্সিকিউটেবলের পাথ। ডিফল্ট: lib/yt-dlp/yt-dlp.exe</td></tr>
+</table>
+
+<h4>ট্যাব ৪: Audio (অডিও)</h4>
+<table>
+  <tr><th>সেটিং</th><th>বিবরণ</th></tr>
+  <tr><td>Audio Device</td><td>হেডফোন আউটপুট ডিভাইস নির্বাচন</td></tr>
+  <tr><td>Monitor Volume</td><td>ডিফল্ট ভলিউম লেভেল (0-100)</td></tr>
+</table>
+
+<h4>ট্যাব ৫: OCR Region (OCR এরিয়া কনফিগারেশন)</h4>
+<table>
+  <tr><th>সেটিং</th><th>বিবরণ</th></tr>
+  <tr><td>ইমেজ ডিসপ্লে</td><td>ক্যাপচার করা ফ্রেম বা লোড করা ইমেজ দেখায়</td></tr>
+  <tr><td>মার্কি সিলেকশন</td><td>মাউস দিয়ে ক্লিক-ড্র্যাগ করে নীল আয়তক্ষেত্র আঁকুন — এটাই OCR এরিয়া</td></tr>
+  <tr><td>X, Y, Width, Height</td><td>নির্বাচিত এরিয়ার পিক্সেল কোঅর্ডিনেট</td></tr>
+  <tr><td>Capture Frame</td><td>বর্তমান ভিডিও থেকে একটি ফ্রেম ক্যাপচার করে</td></tr>
+  <tr><td>Load Image</td><td>ফাইল থেকে একটি স্যাম্পল ইমেজ লোড করে</td></tr>
+  <tr><td>Profile Name</td><td>OCR প্রোফাইলের নাম (যেমন: Channel24_Headline)</td></tr>
+  <tr><td>Save Profile</td><td>প্রোফাইল সেভ করে</td></tr>
+  <tr><td>Test OCR</td><td>নির্বাচিত এরিয়া থেকে পরীক্ষামূলক OCR চালায়</td></tr>
+</table>
+
+<div class="highlight">
+<strong>OCR এরিয়া কনফিগার করার নিয়ম:</strong>
+<ol>
+  <li>"Capture Frame" বা "Load Image" ক্লিক করুন</li>
+  <li>ইমেজে হেডলাইন টেক্সটের উপর মাউস দিয়ে ক্লিক-ড্র্যাগ করে আয়তক্ষেত্র আঁকুন</li>
+  <li>শুধু টেক্সট এরিয়া সিলেক্ট করুন — লোগো বা টিকার বাদ দিন</li>
+  <li>"Test OCR" দিয়ে যাচাই করুন</li>
+  <li>"Save Profile" দিয়ে সেভ করুন</li>
+</ol>
+</div>
+
+<h4>Save Settings ও Reset বাটন</h4>
+<p>পেজের নিচে দুটি বাটন আছে:</p>
+<ul>
+  <li><span class="btn btn-blue">Save Settings</span> — সব পরিবর্তন সেভ করে <code>settings.json</code> ফাইলে</li>
+  <li><span class="btn btn-blue">Reset</span> — শেষ সেভ করা মানগুলোতে ফিরিয়ে আনে</li>
+</ul>
+
+<!-- ==================== SECTION 4: SERVER ==================== -->
+<div class="server-section">
+<h2 id="server" class="page-break">৪. OnAirCut Render Server — বিস্তারিত নির্দেশিকা</h2>
+
+<h3>৪.১ মূল ইন্টারফেস</h3>
+<p>রেন্ডার সার্ভার অ্যাপটি বাম পাশে ট্যাব ন্যাভিগেশন সহ ফুলস্ক্রিনে খুলবে।</p>
+
+<h4>টাইটেল বার</h4>
+<table>
+  <tr><th>উপাদান</th><th>বিবরণ</th></tr>
+  <tr><td>শেয়ারড ফোল্ডার স্ট্যাটাস</td><td>🟢 সংযুক্ত / 🔴 বিচ্ছিন্ন</td></tr>
+  <tr><td>Pending কাউন্ট</td><td>কতগুলো জব অপেক্ষায় আছে</td></tr>
+  <tr><td>ঘড়ি</td><td>বর্তমান সময়</td></tr>
+</table>
+
+<h3>৪.২ Dashboard ট্যাব</h3>
+<p>সার্ভারের সামগ্রিক অবস্থা দেখায়।</p>
+<table>
+  <tr><th>উপাদান</th><th>বিবরণ</th></tr>
+  <tr><td>🔵 Pending কার্ড</td><td>অপেক্ষায় থাকা জবের সংখ্যা</td></tr>
+  <tr><td>🟡 Active কার্ড</td><td>বর্তমানে প্রসেস হচ্ছে এমন জবের সংখ্যা</td></tr>
+  <tr><td>🟢 Completed কার্ড</td><td>আজ সম্পন্ন হওয়া জবের সংখ্যা</td></tr>
+  <tr><td>🔴 Failed কার্ড</td><td>আজ ব্যর্থ হওয়া জবের সংখ্যা</td></tr>
+  <tr><td>প্রগ্রেস বার</td><td>বর্তমান জবের রেন্ডার অগ্রগতি (%)</td></tr>
+  <tr><td>Speed/ETA</td><td>রেন্ডার গতি এবং আনুমানিক অবশিষ্ট সময়</td></tr>
+  <tr><td>সাম্প্রতিক কার্যকলাপ</td><td>শেষ ১০টি ইভেন্টের তালিকা</td></tr>
+</table>
+
+<h3>৪.৩ Queue ট্যাব</h3>
+<p>সব জবের তালিকা এবং তাদের বর্তমান অবস্থা।</p>
+<table>
+  <tr><th>কলাম</th><th>বিবরণ</th></tr>
+  <tr><td>JobId</td><td>জবের অনন্য পরিচিতি নম্বর</td></tr>
+  <tr><td>Title</td><td>OCR থেকে পাওয়া শিরোনাম (প্রসেসিংয়ের পর)</td></tr>
+  <tr><td>Source</td><td>কোন চ্যানেল/সোর্স থেকে</td></tr>
+  <tr><td>Ad Set</td><td>কোন বিজ্ঞাপন সেট ব্যবহৃত</td></tr>
+  <tr><td>Status</td><td>বর্তমান অবস্থা (রঙিন চিপ)</td></tr>
+  <tr><td>Current Step</td><td>কোন ধাপে আছে (FrameExtraction/Rendering/OCR ইত্যাদি)</td></tr>
+</table>
+
+<p><strong>জব অ্যাকশন (রাইট-ক্লিক মেনু):</strong></p>
+<ul>
+  <li><strong>View Detail</strong> — জবের বিস্তারিত তথ্য দেখুন</li>
+  <li><strong>Retry</strong> — ব্যর্থ জব পুনরায় চেষ্টা করুন</li>
+  <li><strong>Cancel</strong> — অপেক্ষায় থাকা জব বাতিল করুন</li>
+  <li><strong>Open Output</strong> — আউটপুট ফোল্ডার খুলুন</li>
+</ul>
+
+<h3>৪.৪ History ট্যাব</h3>
+<p>সব প্রসেস করা স্টোরি অনুসন্ধান করুন।</p>
+<ul>
+  <li>টেক্সট সার্চ (শিরোনাম দিয়ে)</li>
+  <li>তারিখ পরিসর ফিল্টার</li>
+  <li>স্ট্যাটাস ফিল্টার (মাল্টি-সিলেক্ট)</li>
+  <li>CSV এক্সপোর্ট বাটন</li>
+</ul>
+
+<h3 class="page-break">৪.৫ Settings ট্যাব — প্রতিটি সাব-ট্যাবের বিবরণ</h3>
+
+<h4>General (সাধারণ)</h4>
+<table>
+  <tr><th>সেটিং</th><th>বিবরণ</th></tr>
+  <tr><td>API Port</td><td>REST API পোর্ট। ডিফল্ট: 5123</td></tr>
+  <tr><td>API Enabled</td><td>API চালু/বন্ধ টগল</td></tr>
+</table>
+
+<h4>Shared Folder (শেয়ারড ফোল্ডার)</h4>
+<p>রেকর্ডারের মতোই — পাথ সেট, ফোল্ডার স্ট্রাকচার তৈরি, ভ্যালিডেশন।</p>
+
+<h4>Rendering (রেন্ডারিং)</h4>
+<table>
+  <tr><th>সেটিং</th><th>বিবরণ</th></tr>
+  <tr><td>FFmpeg Path</td><td>FFmpeg এর পাথ। ডিফল্ট: lib/ffmpeg/ffmpeg.exe</td></tr>
+  <tr><td>FFprobe Path</td><td>FFprobe এর পাথ। ডিফল্ট: lib/ffmpeg/ffprobe.exe</td></tr>
+  <tr><td>Output Video Codec</td><td>আউটপুট কোডেক। ডিফল্ট: libx264</td></tr>
+  <tr><td>Output Preset</td><td>এনকোডিং প্রিসেট। ডিফল্ট: fast (দ্রুত হলে ultrafast, মান ভালো হলে medium)</td></tr>
+  <tr><td>CRF</td><td>কোয়ালিটি ফ্যাক্টর (0-51)। ডিফল্ট: 18 (কম = ভালো মান, বেশি ফাইল সাইজ)</td></tr>
+  <tr><td>Audio Codec</td><td>অডিও কোডেক। ডিফল্ট: aac</td></tr>
+  <tr><td>Audio Bitrate</td><td>অডিও বিটরেট। ডিফল্ট: 192k</td></tr>
+  <tr><td>Max Concurrent Renders</td><td>একসাথে কতগুলো রেন্ডার চলবে। ডিফল্ট: 1</td></tr>
+</table>
+
+<h4>OCR (টেক্সট শনাক্তকরণ)</h4>
+<table>
+  <tr><th>সেটিং</th><th>বিবরণ</th></tr>
+  <tr><td>OCR Engine Path</td><td>Tesseract ডেটা ফোল্ডার। ডিফল্ট: lib/tessdata</td></tr>
+  <tr><td>OCR Language</td><td>ভাষা কোড। ডিফল্ট: ben (বাংলা)</td></tr>
+  <tr><td>Multi-frame Count</td><td>OCR কনসেনসাসের জন্য কতগুলো ফ্রেম ব্যবহার হবে। ডিফল্ট: 5</td></tr>
+</table>
+
+<h4>Queue (কিউ)</h4>
+<table>
+  <tr><th>সেটিং</th><th>বিবরণ</th></tr>
+  <tr><td>Poll Interval (ms)</td><td>কত মিলিসেকেন্ড পরপর নতুন জব চেক করবে। ডিফল্ট: 2000</td></tr>
+  <tr><td>File Ready Check Interval (ms)</td><td>ফাইল রেডি কিনা চেক করার ইন্টারভাল। ডিফল্ট: 1000</td></tr>
+  <tr><td>File Ready Stable Seconds</td><td>ফাইল সাইজ কত সেকেন্ড স্থিতিশীল থাকলে রেডি বলে গণ্য হবে। ডিফল্ট: 3</td></tr>
+</table>
+
+<h4>Storage (সংরক্ষণ)</h4>
+<table>
+  <tr><th>সেটিং</th><th>বিবরণ</th></tr>
+  <tr><td>Database Path</td><td>SQLite ডেটাবেসের পাথ। ডিফল্ট: AppData/onaircut.db</td></tr>
+  <tr><td>Temp Working Folder</td><td>অস্থায়ী কাজের ফোল্ডার</td></tr>
+  <tr><td>Cleanup Days</td><td>কত দিন পর Working ফোল্ডার পরিষ্কার হবে। ডিফল্ট: 7</td></tr>
+</table>
+
+<h3>৪.৬ Logs ট্যাব</h3>
+<table>
+  <tr><th>উপাদান</th><th>বিবরণ</th></tr>
+  <tr><td>Level ফিল্টার</td><td>Debug/Info/Warning/Error দিয়ে ফিল্টার</td></tr>
+  <tr><td>Job ID ফিল্টার</td><td>নির্দিষ্ট জবের লগ দেখুন</td></tr>
+  <tr><td>সার্চ</td><td>লগের মধ্যে টেক্সট খুঁজুন</td></tr>
+  <tr><td>Auto-scroll</td><td>নতুন লগে স্বয়ংক্রিয়ভাবে স্ক্রল করবে</td></tr>
+  <tr><td>Clear</td><td>ডিসপ্লে পরিষ্কার করে (ফাইল মুছে না)</td></tr>
+</table>
+
+</div>
+
+<!-- ==================== SECTION 5: WORKFLOW ==================== -->
+<h2 id="workflow" class="page-break">৫. কর্মপ্রবাহ (Workflow)</h2>
+
+<h3>৫.১ সম্পূর্ণ কর্মপ্রবাহ — ধাপে ধাপে</h3>
+
+<h4>ধাপ ১: সোর্স সংযোগ (রেকর্ডার)</h4>
+<ol>
+  <li>রেকর্ডার অ্যাপ খুলুন</li>
+  <li>বাম প্যানেলে সোর্স টাইপ নির্বাচন করুন:
+    <ul>
+      <li><strong>YouTube URL:</strong> লিংক পেস্ট করুন → Connect চাপুন</li>
+      <li><strong>Local File:</strong> Browse ক্লিক করুন → ফাইল নির্বাচন → Connect</li>
+      <li><strong>Live Feed:</strong> ডিভাইস নির্বাচন → Connect</li>
+    </ul>
+  </li>
+  <li>প্রিভিউতে ভিডিও দেখা যাবে, হেডফোনে অডিও শোনা যাবে</li>
+</ol>
+
+<h4>ধাপ ২: নিউজ স্টোরি রেকর্ড (রেকর্ডার)</h4>
+<ol>
+  <li>প্রেজেন্টার স্টোরি পড়া শুরু করলে <span class="btn btn-red">● Record</span> চাপুন (বা <span class="key">F5</span>)</li>
+  <li>REC ইন্ডিকেটর জ্বলবে, সময় গণনা শুরু হবে</li>
+  <li>প্রয়োজনে <span class="btn btn-orange">T Capture Text</span> চাপুন — হেডলাইন টেক্সট ক্যাপচার হবে</li>
+  <li>স্টোরি ও ভিডিও রিপোর্ট শেষ হলে <span class="btn btn-red">■ Stop</span> চাপুন (বা <span class="key">F6</span>)</li>
+  <li>ক্লিপটি ডান প্যানেলের "Pending Clips" তালিকায় যোগ হবে</li>
+  <li><strong>এখনই পরবর্তী স্টোরি রেকর্ড শুরু করতে পারবেন — সাবমিটের জন্য অপেক্ষা করতে হবে না!</strong></li>
+</ol>
+
+<h4>ধাপ ৩: বিজ্ঞাপন সেট নির্বাচন ও সাবমিট (রেকর্ডার)</h4>
+<ol>
+  <li>ডান প্যানেলে বিজ্ঞাপন সেট নির্বাচন করুন (রেডিও বাটন)</li>
+  <li>অথবা "No Ad" নির্বাচন করুন বিজ্ঞাপন ছাড়া</li>
+  <li>পেন্ডিং ক্লিপের পাশে ▶ (Send) বাটন চাপুন, অথবা</li>
+  <li><span class="btn btn-green">Submit All</span> চাপুন সব ক্লিপ একসাথে সাবমিট করতে</li>
+</ol>
+
+<h4>ধাপ ৪: স্বয়ংক্রিয় প্রসেসিং (রেন্ডার সার্ভার)</h4>
+<p>জব সাবমিট হওয়ার পর রেন্ডার সার্ভার স্বয়ংক্রিয়ভাবে প্রসেস করে:</p>
+<div class="flow-diagram">১. DETECT    → Jobs\Pending\ থেকে জব শনাক্ত
+২. CLAIM     → Jobs\Processing\ তে সরিয়ে নেয়
+৩. FILE CHECK → কাঁচা ক্লিপ ফাইল সম্পূর্ণ লেখা হয়েছে কিনা যাচাই
+৪. PROBE     → FFprobe দিয়ে ভিডিও তথ্য (দৈর্ঘ্য, রেজোলিউশন) বের
+৫. EXTRACT   → FFmpeg দিয়ে ২০টি ফ্রেম এক্সট্রাক্ট
+৬. RENDER    → TVC বিজ্ঞাপন ঢোকানো + ওভারলে যোগ + এনকোড
+৭. OCR       → ৫টি ফ্রেম থেকে বাংলা হেডলাইন টেক্সট পড়া
+৮. ORGANIZE  → OCR টেক্সট দিয়ে ফোল্ডার/ফাইল নামকরণ
+৯. DATABASE  → SQLite ডেটাবেসে শিরোনাম, পাথ, স্ট্যাটাস সংরক্ষণ
+১০. DONE     → জব ফাইল Jobs\Done\ তে সরানো</div>
+
+<h4>ধাপ ৫: চূড়ান্ত আউটপুট</h4>
+<p>প্রসেসিং শেষে প্রতিটি স্টোরির জন্য একটি ফোল্ডার তৈরি হয়:</p>
+<div class="flow-diagram">\\MediaShare\Output\2026-03-15\
+  বাংলাদেশ_ব্যাংকের_নতুন_নীতিমালা\
+    বাংলাদেশ_ব্যাংকের_নতুন_নীতিমালা.mp4    ← চূড়ান্ত ভিডিও (TVC + ওভারলে সহ)
+    metadata.json                              ← জবের বিস্তারিত তথ্য
+    frames\
+      frame_001.jpg ... frame_020.jpg          ← থাম্বনেইল তৈরির জন্য ফ্রেম</div>
+
+<p>এই ভিডিও সরাসরি ইউটিউব, ফেসবুক বা টিকটকে আপলোড করা যাবে। ফ্রেমগুলো থাম্বনেইল হিসেবে ব্যবহার করা যাবে।</p>
+
+<!-- ==================== SECTION 6: SHORTCUTS ==================== -->
+<h2 id="shortcuts" class="page-break">৬. কীবোর্ড শর্টকাট (Recorder)</h2>
+
+<table>
+  <tr><th>শর্টকাট</th><th>কাজ</th></tr>
+  <tr><td><span class="key">F5</span></td><td>রেকর্ডিং শুরু</td></tr>
+  <tr><td><span class="key">F6</span></td><td>রেকর্ডিং বন্ধ</td></tr>
+  <tr><td><span class="key">Escape</span></td><td>বর্তমান ক্লিপ বাতিল</td></tr>
+  <tr><td><span class="key">F8</span></td><td>জব সাবমিট</td></tr>
+  <tr><td><span class="key">Ctrl+F</span></td><td>সার্চ বক্সে ফোকাস</td></tr>
+  <tr><td><span class="key">Space</span></td><td>প্লে/পজ (লোকাল ফাইল মোডে)</td></tr>
+  <tr><td><span class="key">Ctrl+S</span></td><td>সেটিংস খুলুন/বন্ধ করুন</td></tr>
+</table>
+
+<!-- ==================== SECTION 7: TROUBLESHOOTING ==================== -->
+<h2 id="troubleshooting">৭. সমস্যা সমাধান</h2>
+
+<h3>সাধারণ সমস্যা ও সমাধান</h3>
+
+<h4>❌ শেয়ারড ফোল্ডার "Not Connected" দেখাচ্ছে</h4>
+<ul>
+  <li>Settings > Shared Folder ট্যাবে পাথ সঠিক কিনা যাচাই করুন</li>
+  <li>নেটওয়ার্ক সংযোগ পরীক্ষা করুন</li>
+  <li>উভয় পিসিতে ফোল্ডারের read/write পারমিশন আছে কিনা দেখুন</li>
+  <li>"Create Folder Structure" ক্লিক করুন</li>
+</ul>
+
+<h4>❌ ইউটিউব ভিডিও লোড হচ্ছে না</h4>
+<ul>
+  <li>ইন্টারনেট সংযোগ পরীক্ষা করুন</li>
+  <li>yt-dlp ফাইল <code>lib/yt-dlp/yt-dlp.exe</code> তে আছে কিনা যাচাই করুন</li>
+  <li>URL সঠিক এবং লাইভ/পাবলিক কিনা নিশ্চিত করুন</li>
+</ul>
+
+<h4>❌ রেকর্ড করা ফাইল প্লে হচ্ছে না</h4>
+<ul>
+  <li>FFmpeg পাথ সেটিংসে সঠিক কিনা যাচাই করুন</li>
+  <li><code>lib/ffmpeg/ffmpeg.exe</code> ফাইল আছে কিনা দেখুন</li>
+  <li>রেকর্ডিং কমপক্ষে ৩ সেকেন্ড হতে হবে</li>
+</ul>
+
+<h4>❌ OCR ভুল টেক্সট দিচ্ছে বা কাজ করছে না</h4>
+<ul>
+  <li>OCR Region সঠিকভাবে কনফিগার করুন (Settings > OCR Region)</li>
+  <li>শুধু হেডলাইন টেক্সটের উপর মার্কি দিন</li>
+  <li><code>lib/tessdata/ben.traineddata</code> ফাইল আছে কিনা দেখুন</li>
+  <li>"Test OCR" দিয়ে পরীক্ষা করুন</li>
+</ul>
+
+<h4>❌ জব "Pending" এ আটকে আছে</h4>
+<ul>
+  <li>রেন্ডার সার্ভার চালু আছে কিনা দেখুন</li>
+  <li>সার্ভারের Shared Folder পাথ রেকর্ডারের সাথে মিলে কিনা যাচাই করুন</li>
+  <li>সার্ভারের Logs ট্যাবে ত্রুটি দেখুন</li>
+</ul>
+
+<h4>❌ রেন্ডার ব্যর্থ হচ্ছে</h4>
+<ul>
+  <li>সার্ভারের Queue > Job Detail-এ ত্রুটির বিবরণ দেখুন</li>
+  <li>FFmpeg পাথ সঠিক কিনা যাচাই করুন</li>
+  <li>ডিস্ক স্পেস পর্যাপ্ত আছে কিনা দেখুন</li>
+  <li>"No Ad" দিয়ে পরীক্ষা করুন — সমস্যা বিজ্ঞাপনে নাকি মূল ক্লিপে বুঝতে পারবেন</li>
+</ul>
+
+<h3>ফাইলের অবস্থান</h3>
+<table>
+  <tr><th>ফাইল</th><th>অবস্থান</th></tr>
+  <tr><td>রেকর্ডার সেটিংস</td><td>{exe ফোল্ডার}\settings.json</td></tr>
+  <tr><td>সার্ভার সেটিংস</td><td>{exe ফোল্ডার}\settings.json</td></tr>
+  <tr><td>ডেটাবেস</td><td>{exe ফোল্ডার}\AppData\onaircut.db</td></tr>
+  <tr><td>FFmpeg</td><td>{exe ফোল্ডার}\lib\ffmpeg\ffmpeg.exe</td></tr>
+  <tr><td>yt-dlp</td><td>{exe ফোল্ডার}\lib\yt-dlp\yt-dlp.exe</td></tr>
+  <tr><td>OCR ডেটা</td><td>{exe ফোল্ডার}\lib\tessdata\</td></tr>
+</table>
+
+<div class="footer">
+<p><strong>OnAirCut v1.0</strong><br>
+Semi-Real-Time Newsroom Clipping &amp; Ad-Insertion Pipeline<br>
+© 2026</p>
+</div>
+
+</body>
+</html>

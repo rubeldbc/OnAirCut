@@ -1,0 +1,15 @@
+{
+  "sharedFolderPath": "",
+  "defaultSourceType": "LocalFile",
+  "defaultAdSet": "",
+  "recordingFormat": "mp4",
+  "recordingCodec": "libx264",
+  "audioDevice": "",
+  "monitorVolume": 80,
+  "operatorName": "Operator",
+  "ffmpegPath": "lib/ffmpeg/ffmpeg.exe",
+  "ytDlpPath": "lib/yt-dlp/yt-dlp.exe",
+  "autoSubmitOnRecordStop": false,
+  "renderServerApiUrl": "http://localhost:5123",
+  "ocrProfileName": ""
+}

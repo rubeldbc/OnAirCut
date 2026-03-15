@@ -1,0 +1,167 @@
+<Window x:Class="OnAirCut.RenderServer.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:vm="clr-namespace:OnAirCut.RenderServer.ViewModels"
+        xmlns:views="clr-namespace:OnAirCut.RenderServer.Views"
+        xmlns:converters="clr-namespace:OnAirCut.RenderServer.Converters"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
+        Title="{Binding Title}"
+        WindowState="Maximized"
+        MinHeight="600" MinWidth="1024"
+        WindowStartupLocation="CenterScreen"
+        Style="{StaticResource MaterialDesignWindow}"
+        Background="{DynamicResource MaterialDesign.Brush.Background}"
+        TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        FontFamily="{DynamicResource MaterialDesignFont}">
+
+    <Window.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Title Bar -->
+        <materialDesign:ColorZone Grid.Row="0" Mode="PrimaryDark" Padding="12">
+            <DockPanel>
+                <materialDesign:PackIcon Kind="ServerNetwork" Width="28" Height="28"
+                                         VerticalAlignment="Center" Margin="0,0,10,0" />
+                <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="Medium"
+                           VerticalAlignment="Center" />
+
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right"
+                            HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <!-- Shared Folder Status -->
+                    <materialDesign:PackIcon Kind="FolderNetwork" Width="18" Height="18"
+                                             VerticalAlignment="Center" Margin="0,0,4,0" />
+                    <Ellipse Width="10" Height="10" Margin="0,0,4,0"
+                             VerticalAlignment="Center">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="#EF5350" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSharedFolderHealthy}" Value="True">
+                                        <Setter Property="Fill" Value="#66BB6A" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <TextBlock Text="{Binding SharedFolderStatus}" VerticalAlignment="Center"
+                               Margin="0,0,20,0" FontSize="12" />
+
+                    <!-- Pending Count -->
+                    <materialDesign:PackIcon Kind="Tray" Width="18" Height="18"
+                                             VerticalAlignment="Center" Margin="0,0,4,0" />
+                    <TextBlock VerticalAlignment="Center" Margin="0,0,20,0" FontSize="12">
+                        <Run Text="Pending: " /><Run Text="{Binding PendingJobsCount}" FontWeight="Bold" />
+                    </TextBlock>
+
+                    <!-- Clock -->
+                    <materialDesign:PackIcon Kind="ClockOutline" Width="18" Height="18"
+                                             VerticalAlignment="Center" Margin="0,0,4,0" />
+                    <TextBlock Text="{Binding CurrentTime}" VerticalAlignment="Center"
+                               FontSize="13" FontFamily="Consolas" FontWeight="Medium" />
+                </StackPanel>
+            </DockPanel>
+        </materialDesign:ColorZone>
+
+        <!-- Main Content: TabControl -->
+        <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex}"
+                    materialDesign:NavigationRailAssist.ShowSelectionBackground="True"
+                    Style="{StaticResource MaterialDesignFilledTabControl}"
+                    TabStripPlacement="Left">
+
+            <!-- Dashboard Tab -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="ViewDashboard" Width="24" Height="24"
+                                                 HorizontalAlignment="Center" />
+                        <TextBlock Text="Dashboard" HorizontalAlignment="Center"
+                                   Margin="0,4,0,0" FontSize="11" />
+                    </StackPanel>
+                </TabItem.Header>
+                <views:DashboardView DataContext="{Binding DashboardViewModel}" />
+            </TabItem>
+
+            <!-- Queue Tab -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="PlaylistPlay" Width="24" Height="24"
+                                                 HorizontalAlignment="Center" />
+                        <TextBlock Text="Queue" HorizontalAlignment="Center"
+                                   Margin="0,4,0,0" FontSize="11" />
+                    </StackPanel>
+                </TabItem.Header>
+                <views:QueueView DataContext="{Binding QueueViewModel}" />
+            </TabItem>
+
+            <!-- History Tab -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="History" Width="24" Height="24"
+                                                 HorizontalAlignment="Center" />
+                        <TextBlock Text="History" HorizontalAlignment="Center"
+                                   Margin="0,4,0,0" FontSize="11" />
+                    </StackPanel>
+                </TabItem.Header>
+                <views:HistoryView DataContext="{Binding HistoryViewModel}" />
+            </TabItem>
+
+            <!-- Settings Tab -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="Cog" Width="24" Height="24"
+                                                 HorizontalAlignment="Center" />
+                        <TextBlock Text="Settings" HorizontalAlignment="Center"
+                                   Margin="0,4,0,0" FontSize="11" />
+                    </StackPanel>
+                </TabItem.Header>
+                <views:SettingsView DataContext="{Binding SettingsViewModel}" />
+            </TabItem>
+
+            <!-- Logs Tab -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel>
+                        <materialDesign:PackIcon Kind="TextBoxMultiple" Width="24" Height="24"
+                                                 HorizontalAlignment="Center" />
+                        <TextBlock Text="Logs" HorizontalAlignment="Center"
+                                   Margin="0,4,0,0" FontSize="11" />
+                    </StackPanel>
+                </TabItem.Header>
+                <views:LogsView DataContext="{Binding LogsViewModel}" />
+            </TabItem>
+        </TabControl>
+
+        <!-- Status Bar -->
+        <materialDesign:ColorZone Grid.Row="2" Mode="PrimaryDark" Padding="10,4">
+            <DockPanel>
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="ServerNetwork" Width="14" Height="14"
+                                             VerticalAlignment="Center" Margin="0,0,6,0" Opacity="0.7" />
+                    <TextBlock Text="Ready" FontSize="11" VerticalAlignment="Center" Opacity="0.8" />
+                </StackPanel>
+                <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Right"
+                           Text="OnAirCut Render Server v1.0" FontSize="11"
+                           VerticalAlignment="Center" Opacity="0.5" />
+            </DockPanel>
+        </materialDesign:ColorZone>
+    </Grid>
+</Window>
