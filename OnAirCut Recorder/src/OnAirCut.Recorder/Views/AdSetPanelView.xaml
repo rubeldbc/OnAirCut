@@ -11,12 +11,21 @@
     <materialDesign:Card Padding="12" Margin="4">
         <DockPanel>
             <!-- Header -->
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,12">
-                <materialDesign:PackIcon Kind="Advertisements" Width="20" Height="20"
-                                         VerticalAlignment="Center" Margin="0,0,8,0" />
-                <TextBlock Text="Ad Set" FontSize="16" FontWeight="Medium"
-                           VerticalAlignment="Center" />
-            </StackPanel>
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="Advertisements" Width="20" Height="20"
+                                             VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="Ad Set" FontSize="16" FontWeight="Medium"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+                <Button DockPanel.Dock="Right" HorizontalAlignment="Right"
+                        Command="{Binding LoadAdSetsCommand}"
+                        Style="{StaticResource MaterialDesignIconButton}"
+                        ToolTip="Refresh ad sets"
+                        Width="28" Height="28">
+                    <materialDesign:PackIcon Kind="Refresh" Width="16" Height="16" />
+                </Button>
+            </DockPanel>
 
             <!-- Ad Set List -->
             <ScrollViewer VerticalScrollBarVisibility="Auto">

@@ -161,8 +161,9 @@ public partial class AdvertiseManagerViewModel : ObservableObject
     {
         try
         {
-            var adSets = await _adSetProvider.GetAvailableAdSetsAsync();
-            AdSetNames = new ObservableCollection<string>(adSets.Select(a => a.Name));
+            // Show ALL folders (with or without config.json) so user can configure any
+            var allNames = await _adSetProvider.GetAllAdSetFolderNamesAsync();
+            AdSetNames = new ObservableCollection<string>(allNames);
         }
         catch (Exception ex) { Log.Error(ex, "Failed to load ad set list"); }
     }

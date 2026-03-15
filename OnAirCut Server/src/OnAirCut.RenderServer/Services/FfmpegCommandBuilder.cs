@@ -153,7 +153,9 @@ public class FfmpegCommandBuilder
         // Remove trailing semicolon from filters
         var filterStr = filters.ToString().TrimEnd(';');
 
-        return $"-y {inputs} -filter_complex \"{filterStr}\" -map \"[{lastVideoLabel}]\" -map \"[{lastAudioLabel}]\" {encArgs} \"{outputPath}\"";
+        // Audio: use [label] for filter graph outputs, plain stream ref for direct mapping
+        var audioMap = lastAudioLabel == "0:a" ? $"-map 0:a" : $"-map \"[{lastAudioLabel}]\"";
+        return $"-y {inputs} -filter_complex \"{filterStr}\" -map \"[{lastVideoLabel}]\" {audioMap} {encArgs} \"{outputPath}\"";
     }
 
     private static string BuildPopupEnableExpr(PopupAdConfig p, double totalDuration)

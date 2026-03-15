@@ -52,10 +52,12 @@ public partial class AdSetPanelViewModel : ObservableObject
         SelectedAdSet = adSet;
     }
 
+    [RelayCommand]
     public async Task LoadAdSetsAsync()
     {
         try
         {
+            // Only show configured ad sets (with config.json) on the recording page
             var adSets = await _adSetProvider.GetAvailableAdSetsAsync();
             AvailableAdSets = new ObservableCollection<AdSetConfig>(adSets);
         }
