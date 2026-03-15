@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using OnAirCut.Core.Models;
 using OnAirCut.RenderServer.Models;
+using Serilog;
 
 namespace OnAirCut.RenderServer.Services;
 
@@ -26,15 +27,26 @@ public class FfmpegCommandBuilder
         var encArgs = $"-c:v {codec} -preset {preset} -crf {crf} -c:a {aCodec} -b:a {aBitrate}";
 
         if (adSet is null || !adSet.HasAnyEnabled)
+        {
+            Log.Information("No ad set or none enabled — simple re-encode");
             return $"-y -i \"{inputPath}\" {encArgs} \"{outputPath}\"";
+        }
 
         var hasDoggy = adSet.Doggy is { Enabled: true, File: not null } && File.Exists(adSet.Doggy.File);
         var hasPopup = adSet.Popup is { Enabled: true, File: not null } && File.Exists(adSet.Popup.File);
         var hasTvc = adSet.Tvc is { Enabled: true, File: not null } && File.Exists(adSet.Tvc.File);
 
+        Log.Information("Ad files check: Doggy={Doggy}({DoggyFile},{DoggyExists}), Popup={Popup}({PopupFile},{PopupExists}), TVC={Tvc}({TvcFile},{TvcExists})",
+            hasDoggy, adSet.Doggy?.File ?? "null", adSet.Doggy?.File != null && File.Exists(adSet.Doggy.File),
+            hasPopup, adSet.Popup?.File ?? "null", adSet.Popup?.File != null && File.Exists(adSet.Popup.File),
+            hasTvc, adSet.Tvc?.File ?? "null", adSet.Tvc?.File != null && File.Exists(adSet.Tvc.File));
+
         // Simple re-encode if nothing valid
         if (!hasDoggy && !hasPopup && !hasTvc)
+        {
+            Log.Warning("All ad files missing or disabled — falling back to simple re-encode");
             return $"-y -i \"{inputPath}\" {encArgs} \"{outputPath}\"";
+        }
 
         // Build inputs and filter graph
         var inputs = new StringBuilder();
@@ -79,9 +91,9 @@ public class FfmpegCommandBuilder
                 prev = end;
             }
 
-            // Prepare TVC segments
-            filters.Append($"[{tvcIdx}:v]setpts=PTS-STARTPTS[tvcv];");
-            filters.Append($"[{tvcIdx}:a]asetpts=PTS-STARTPTS[tvca];");
+            // Prepare TVC segments — scale to match main video resolution and sample rate
+            filters.Append($"[{tvcIdx}:v]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setpts=PTS-STARTPTS[tvcv];");
+            filters.Append($"[{tvcIdx}:a]aresample=44100,asetpts=PTS-STARTPTS[tvca];");
 
             // Build concat: seg0 + tvc + seg1 + tvc + ... + segN
             var concatInputs = new StringBuilder();

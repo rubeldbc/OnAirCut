@@ -14,6 +14,7 @@ public class JobSubmissionService
 {
     private readonly ISharedFolderService _sharedFolderService;
     private readonly ISettingsService _settingsService;
+    private readonly IAdSetProvider _adSetProvider;
     private int _dailySequence;
     private DateTime _lastSequenceDate = DateTime.MinValue;
     private readonly object _sequenceLock = new();
@@ -24,10 +25,12 @@ public class JobSubmissionService
         PropertyNameCaseInsensitive = true
     };
 
-    public JobSubmissionService(ISharedFolderService sharedFolderService, ISettingsService settingsService)
+    public JobSubmissionService(ISharedFolderService sharedFolderService, ISettingsService settingsService,
+        IAdSetProvider adSetProvider)
     {
         _sharedFolderService = sharedFolderService;
         _settingsService = settingsService;
+        _adSetProvider = adSetProvider;
     }
 
     public int TodaySubmissionCount => _dailySequence;
@@ -52,6 +55,33 @@ public class JobSubmissionService
             SubmittedBy = _settingsService.Settings.OperatorName,
             SubmittedAt = DateTime.Now
         };
+
+        // Embed the full ad set config JSON so the server has all the details
+        Log.Information("Submitting job {JobId} with adSetName={AdSet}", jobId, adSetName ?? "(none)");
+        if (!string.IsNullOrEmpty(adSetName))
+        {
+            try
+            {
+                var adConfig = await _adSetProvider.GetAdSetByNameAsync(adSetName, cancellationToken);
+                if (adConfig is not null)
+                {
+                    jobFile.AdSetConfigJson = JsonSerializer.Serialize(adConfig, JsonOptions);
+                    Log.Information("Embedded ad config: HasAny={Has}, Doggy={D}, Popup={P}, TVC={T}",
+                        adConfig.HasAnyEnabled,
+                        adConfig.Doggy?.Enabled == true ? adConfig.Doggy.File : "off",
+                        adConfig.Popup?.Enabled == true ? adConfig.Popup.File : "off",
+                        adConfig.Tvc?.Enabled == true ? adConfig.Tvc.File : "off");
+                }
+                else
+                {
+                    Log.Warning("Ad set '{AdSet}' not found by provider", adSetName);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed to embed ad set config for {AdSet}", adSetName);
+            }
+        }
 
         // Try API submission first (reliable, no FileSystemWatcher dependency)
         var apiUrl = _settingsService.Settings.RenderServerApiUrl?.TrimEnd('/');

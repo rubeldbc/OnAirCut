@@ -106,6 +106,22 @@ public class FileBasedAdSetProvider : IAdSetProvider
         return Task.FromResult<IReadOnlyList<string>>(files);
     }
 
+    public Task<IReadOnlyList<string>> GetAllAdSetFolderNamesAsync(CancellationToken cancellationToken = default)
+    {
+        var adSetsPath = _sharedFolderService.GetFullPath(FolderNames.AssetsAdSets);
+        if (!Directory.Exists(adSetsPath))
+            return Task.FromResult<IReadOnlyList<string>>(Array.Empty<string>());
+
+        var names = Directory.GetDirectories(adSetsPath)
+            .Select(Path.GetFileName)
+            .Where(n => n is not null)
+            .Cast<string>()
+            .OrderBy(n => n, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        return Task.FromResult<IReadOnlyList<string>>(names);
+    }
+
     public string GetAdSetFolderPath(string adSetName)
     {
         return Path.Combine(_sharedFolderService.GetFullPath(FolderNames.AssetsAdSets), adSetName);

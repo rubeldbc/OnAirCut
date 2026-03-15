@@ -14,5 +14,10 @@ public interface IAdSetProvider
     /// </summary>
     Task<IReadOnlyList<string>> GetAvailableFilesAsync(string adSetName, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Returns ALL ad set folder names (with or without config.json) for the Advertise Manager.
+    /// </summary>
+    Task<IReadOnlyList<string>> GetAllAdSetFolderNamesAsync(CancellationToken cancellationToken = default);
+
     event EventHandler? AdSetsChanged;
 }

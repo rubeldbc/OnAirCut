@@ -220,8 +220,40 @@ public class JobPipelineOrchestrator : IDisposable
 
             // Step 8: Render
             AdSetConfig? adSet = null;
-            if (!string.IsNullOrEmpty(job.AdSetName))
+            // Try embedded config first (sent by Recorder), then fall back to disk lookup
+            if (!string.IsNullOrEmpty(job.AdSetConfigJson))
+            {
+                try
+                {
+                    adSet = System.Text.Json.JsonSerializer.Deserialize<AdSetConfig>(job.AdSetConfigJson,
+                        new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    Log.Information("Using embedded ad config for job {JobId}: {AdSet}", job.JobId, job.AdSetName);
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning(ex, "Failed to parse embedded ad config, falling back to disk");
+                }
+            }
+            if (adSet is null && !string.IsNullOrEmpty(job.AdSetName))
                 adSet = await _adSetProvider.GetAdSetByNameAsync(job.AdSetName, cancellationToken);
+
+            // Copy ad files to the job's working directory for reliable local access
+            if (adSet is not null && !string.IsNullOrEmpty(job.AdSetName))
+            {
+                var adSetFolder = _adSetProvider.GetAdSetFolderPath(job.AdSetName);
+                var adWorkDir = Path.Combine(workDir, "ads");
+                Directory.CreateDirectory(adWorkDir);
+
+                adSet.Doggy = CopyAdFile(adSet.Doggy, adSetFolder, adWorkDir);
+                adSet.Popup = CopyAdFile(adSet.Popup, adSetFolder, adWorkDir);
+                adSet.Tvc = CopyAdFile(adSet.Tvc, adSetFolder, adWorkDir);
+
+                Log.Information("Ad files copied to {WorkDir} for {JobId}: Doggy={Doggy}, Popup={Popup}, TVC={Tvc}",
+                    adWorkDir, job.JobId,
+                    adSet.Doggy?.Enabled == true ? adSet.Doggy.File : "off",
+                    adSet.Popup?.Enabled == true ? adSet.Popup.File : "off",
+                    adSet.Tvc?.Enabled == true ? adSet.Tvc.File : "off");
+            }
 
             // Build ad info summary for display
             var adInfo = BuildAdInfoSummary(job.AdSetName, adSet);
@@ -380,6 +412,43 @@ public class JobPipelineOrchestrator : IDisposable
                 TvcDetail = CurrentJob.TvcDetail
             });
         }
+    }
+
+    /// <summary>
+    /// Copy an ad file from the ad set folder (or absolute path) to the local working directory.
+    /// Returns the config with the File path updated to the local copy.
+    /// </summary>
+    private static DoggyAdConfig? CopyAdFile(DoggyAdConfig? cfg, string adSetFolder, string destDir)
+    {
+        if (cfg is null || string.IsNullOrEmpty(cfg.File)) return cfg;
+        var src = Path.IsPathRooted(cfg.File) ? cfg.File : Path.Combine(adSetFolder, cfg.File);
+        if (!File.Exists(src)) { Log.Warning("Ad file not found: {Path}", src); return cfg; }
+        var dest = Path.Combine(destDir, Path.GetFileName(src));
+        File.Copy(src, dest, overwrite: true);
+        cfg.File = dest;
+        return cfg;
+    }
+
+    private static PopupAdConfig? CopyAdFile(PopupAdConfig? cfg, string adSetFolder, string destDir)
+    {
+        if (cfg is null || string.IsNullOrEmpty(cfg.File)) return cfg;
+        var src = Path.IsPathRooted(cfg.File) ? cfg.File : Path.Combine(adSetFolder, cfg.File);
+        if (!File.Exists(src)) { Log.Warning("Ad file not found: {Path}", src); return cfg; }
+        var dest = Path.Combine(destDir, Path.GetFileName(src));
+        File.Copy(src, dest, overwrite: true);
+        cfg.File = dest;
+        return cfg;
+    }
+
+    private static TvcAdConfig? CopyAdFile(TvcAdConfig? cfg, string adSetFolder, string destDir)
+    {
+        if (cfg is null || string.IsNullOrEmpty(cfg.File)) return cfg;
+        var src = Path.IsPathRooted(cfg.File) ? cfg.File : Path.Combine(adSetFolder, cfg.File);
+        if (!File.Exists(src)) { Log.Warning("Ad file not found: {Path}", src); return cfg; }
+        var dest = Path.Combine(destDir, Path.GetFileName(src));
+        File.Copy(src, dest, overwrite: true);
+        cfg.File = dest;
+        return cfg;
     }
 
     private static string BuildAdInfoSummary(string? adSetName, AdSetConfig? config)

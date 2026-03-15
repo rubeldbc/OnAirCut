@@ -19,6 +19,7 @@ public partial class RecordingControlsViewModel : ObservableObject, IDisposable
     private readonly ISettingsService _settingsService;
     private readonly JobSubmissionService _jobSubmissionService;
     private readonly TextCaptureService _textCaptureService;
+    private readonly AdSetPanelViewModel _adSetPanel;
     private IVideoSource? _source;
     private Timer? _elapsedTimer;
     private DateTime _recordingStartTime;
@@ -32,12 +33,14 @@ public partial class RecordingControlsViewModel : ObservableObject, IDisposable
         ISharedFolderService sharedFolderService,
         ISettingsService settingsService,
         JobSubmissionService jobSubmissionService,
-        TextCaptureService textCaptureService)
+        TextCaptureService textCaptureService,
+        AdSetPanelViewModel adSetPanel)
     {
         _sharedFolderService = sharedFolderService;
         _settingsService = settingsService;
         _jobSubmissionService = jobSubmissionService;
         _textCaptureService = textCaptureService;
+        _adSetPanel = adSetPanel;
     }
 
     [ObservableProperty]
@@ -177,7 +180,8 @@ public partial class RecordingControlsViewModel : ObservableObject, IDisposable
                 RecordedAt = DateTime.Now,
                 FileName = Path.GetFileName(result.FilePath),
                 Duration = TimeSpan.FromSeconds(result.DurationSeconds),
-                FileSize = FormatFileSize(result.FileSizeBytes)
+                FileSize = FormatFileSize(result.FileSizeBytes),
+                SelectedAdSet = _adSetPanel.SelectedAdSetName
             };
             PendingClips.Insert(0, clip);
             PendingClipsCount = PendingClips.Count;

@@ -395,10 +395,10 @@ public partial class SettingsViewModel : ObservableObject
     {
         if (item is null || item.IsDownloading) return;
 
-        // EasyOCR Bengali Models are auto-downloaded by EasyOCR on first run
-        if (item.Name == "EasyOCR Bengali Models" && string.IsNullOrEmpty(item.DownloadUrl))
+        // EasyOCR Bengali Models — trigger download via Python
+        if (item.Name == "EasyOCR Bengali Models")
         {
-            item.Status = "Auto-downloaded by EasyOCR on first run";
+            await DownloadEasyOcrModelsAsync(item);
             return;
         }
 
@@ -657,5 +657,82 @@ public partial class SettingsViewModel : ObservableObject
 
         item.DownloadProgress = 100;
         item.Status = "Setup complete";
+    }
+
+    private async Task DownloadEasyOcrModelsAsync(DependencyItem item)
+    {
+        var pythonExe = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "lib", "python", "python.exe");
+        if (!File.Exists(pythonExe))
+        {
+            item.Status = "Python not installed. Install 'Python + EasyOCR' first.";
+            return;
+        }
+
+        try
+        {
+            item.IsDownloading = true;
+            item.DownloadProgress = 10;
+            item.Status = "Downloading Bengali OCR models (this takes 2-3 min)...";
+
+            var modelsDir = item.DestinationFolder;
+            Directory.CreateDirectory(modelsDir);
+
+            var proc = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = pythonExe,
+                    Arguments = $"-c \"import easyocr,os; r=easyocr.Reader(['bn','en'],gpu=False,model_storage_directory=r'{modelsDir}',verbose=False); print('OK')\"",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    WorkingDirectory = Path.GetDirectoryName(pythonExe)!
+                }
+            };
+            proc.StartInfo.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8";
+            proc.Start();
+
+            // Animate progress while waiting
+            var animTask = Task.Run(async () =>
+            {
+                var progress = 10.0;
+                while (!proc.HasExited && progress < 95)
+                {
+                    await Task.Delay(3000);
+                    progress += 1;
+                    item.DownloadProgress = progress;
+                    item.Status = $"Downloading models... {progress:F0}%";
+                }
+            });
+
+            var stdout = proc.StandardOutput.ReadToEndAsync();
+            var stderr = proc.StandardError.ReadToEndAsync();
+            await proc.WaitForExitAsync();
+            await animTask;
+            var output = await stdout;
+            var err = await stderr;
+
+            if (proc.ExitCode == 0 && output.Contains("OK"))
+            {
+                item.DownloadProgress = 100;
+                item.Status = "Installed";
+                item.IsInstalled = true;
+            }
+            else
+            {
+                item.Status = $"Download failed (exit {proc.ExitCode})";
+                Log.Warning("EasyOCR model download failed: {Stderr}", err.Length > 500 ? err[..500] : err);
+            }
+        }
+        catch (Exception ex)
+        {
+            item.Status = $"Error: {ex.Message}";
+            Log.Error(ex, "Failed to download EasyOCR models");
+        }
+        finally
+        {
+            item.IsDownloading = false;
+        }
     }
 }
