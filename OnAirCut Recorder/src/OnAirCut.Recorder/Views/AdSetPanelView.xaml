@@ -70,24 +70,12 @@
                                             </StackPanel>
 
                                             <StackPanel Margin="26,4,0,0">
-                                                <TextBlock FontSize="10" Opacity="0.7">
-                                                    <TextBlock.Text>
-                                                        <MultiBinding StringFormat="TVC: {0}">
-                                                            <Binding Path="TvcFile" FallbackValue="None" />
-                                                        </MultiBinding>
-                                                    </TextBlock.Text>
-                                                </TextBlock>
-
-                                                <TextBlock FontSize="10" Opacity="0.7">
-                                                    <TextBlock.Text>
-                                                        <MultiBinding StringFormat="Mode: {0}">
-                                                            <Binding Path="InsertMode" />
-                                                        </MultiBinding>
-                                                    </TextBlock.Text>
-                                                </TextBlock>
-
                                                 <TextBlock FontSize="10" Opacity="0.7"
-                                                           Text="{Binding OverlayFile, StringFormat='Overlay: {0}', FallbackValue='Overlay: None'}" />
+                                                           Text="{Binding Doggy.File, StringFormat='Doggy: {0}', FallbackValue='Doggy: —', TargetNullValue='Doggy: —'}" />
+                                                <TextBlock FontSize="10" Opacity="0.7"
+                                                           Text="{Binding Popup.File, StringFormat='Popup: {0}', FallbackValue='Popup: —', TargetNullValue='Popup: —'}" />
+                                                <TextBlock FontSize="10" Opacity="0.7"
+                                                           Text="{Binding Tvc.File, StringFormat='TVC: {0}', FallbackValue='TVC: —', TargetNullValue='TVC: —'}" />
                                             </StackPanel>
                                         </StackPanel>
                                     </materialDesign:Card>

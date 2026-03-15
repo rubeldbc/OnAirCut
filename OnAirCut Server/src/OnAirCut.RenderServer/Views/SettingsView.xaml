@@ -47,6 +47,24 @@
                             </StackPanel>
                         </UniformGrid>
 
+                        <!-- Server Address Info -->
+                        <Border Background="#1A3A1A" CornerRadius="6" Padding="12" Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Text="CONNECT RECORDER USING:" FontSize="10" FontWeight="Bold"
+                                           Opacity="0.7" Margin="0,0,0,6" />
+                                <ItemsControl ItemsSource="{Binding ServerAddresses}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontFamily="Consolas" FontSize="13"
+                                                       Foreground="#66BB6A" Margin="0,1" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <TextBlock Text="Copy any address above into Recorder → Settings → Render Server URL"
+                                           FontSize="10" Opacity="0.5" Margin="0,6,0,0" />
+                            </StackPanel>
+                        </Border>
+
                         <Separator Margin="0,0,0,16" />
 
                         <!-- Dependencies Section -->

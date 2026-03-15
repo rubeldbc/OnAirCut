@@ -43,6 +43,7 @@ public static class ServiceRegistration
         services.AddSingleton<RecordingControlsViewModel>();
         services.AddSingleton<AdSetPanelViewModel>();
         services.AddSingleton<HistoryPanelViewModel>();
+        services.AddSingleton<AdvertiseManagerViewModel>();
         services.AddSingleton<SettingsViewModel>();
         services.AddSingleton<OcrRegionViewModel>();
 

@@ -32,6 +32,10 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         _sharedFolderService.HealthChanged += OnSharedFolderHealthChanged;
         SourcePanel.SourceChanged += OnSourceChanged;
 
+        // Read initial health state (may already be healthy by the time VM is created)
+        IsSharedFolderHealthy = _sharedFolderService.IsHealthy;
+        SharedFolderStatus = _sharedFolderService.IsHealthy ? "Connected" : "Not Connected";
+
         StartClockTimer();
     }
 

@@ -107,7 +107,7 @@ public class SqliteRepository : IDisposable
 
         using var cmd = _connection.CreateCommand();
         cmd.CommandText = """
-            INSERT INTO ProcessedStories (JobId, TitleRaw, TitleNormalized, SafeFolderName, SourceType,
+            INSERT OR REPLACE INTO ProcessedStories (JobId, TitleRaw, TitleNormalized, SafeFolderName, SourceType,
                 SourceName, OnAirDateTime, ClipStartTime, ClipEndTime, DurationSeconds, AdSetName, OverlaySetName,
                 RawClipPath, OutputFolderPath, OutputVideoPath, FramesPath, OcrConfidence, OcrProfileUsed,
                 SubmittedBy, SubmittedAt, ProcessingStartedAt, ProcessedAt, Status, ErrorMessage, CreatedAt)

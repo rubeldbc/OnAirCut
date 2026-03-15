@@ -11,6 +11,14 @@ public class FileBasedAdSetProvider : IAdSetProvider
 {
     private readonly ISharedFolderService _sharedFolderService;
 
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = true
+    };
+
+    private static readonly string[] VideoExtensions = [".mp4", ".mov", ".avi", ".mkv"];
+
     public FileBasedAdSetProvider(ISharedFolderService sharedFolderService)
     {
         _sharedFolderService = sharedFolderService;
@@ -32,21 +40,20 @@ public class FileBasedAdSetProvider : IAdSetProvider
 
         foreach (var dir in Directory.GetDirectories(adSetsPath))
         {
+            var folderName = Path.GetFileName(dir);
             var configPath = Path.Combine(dir, "config.json");
+
             if (File.Exists(configPath))
             {
                 try
                 {
                     var json = await File.ReadAllTextAsync(configPath, cancellationToken);
-                    var config = JsonSerializer.Deserialize<AdSetConfig>(json);
+                    var config = JsonSerializer.Deserialize<AdSetConfig>(json, JsonOptions);
                     if (config != null)
                     {
-                        // Resolve relative paths to absolute
-                        if (!string.IsNullOrEmpty(config.TvcFile) && !Path.IsPathRooted(config.TvcFile))
-                            config.TvcFile = Path.Combine(dir, config.TvcFile);
-                        if (!string.IsNullOrEmpty(config.OverlayFile) && !Path.IsPathRooted(config.OverlayFile))
-                            config.OverlayFile = Path.Combine(dir, config.OverlayFile);
-
+                        if (string.IsNullOrEmpty(config.Name))
+                            config.Name = folderName;
+                        ResolveFilePaths(config, dir);
                         result.Add(config);
                     }
                 }
@@ -54,6 +61,10 @@ public class FileBasedAdSetProvider : IAdSetProvider
                 {
                     Log.Warning(ex, "Failed to read ad set config: {Path}", configPath);
                 }
+            }
+            else
+            {
+                result.Add(new AdSetConfig { Name = folderName });
             }
         }
 
@@ -66,8 +77,47 @@ public class FileBasedAdSetProvider : IAdSetProvider
         return adSets.FirstOrDefault(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
     }
 
+    public async Task SaveAdSetConfigAsync(string adSetName, AdSetConfig config, CancellationToken cancellationToken = default)
+    {
+        var folderPath = GetAdSetFolderPath(adSetName);
+        Directory.CreateDirectory(folderPath);
+
+        var configPath = Path.Combine(folderPath, "config.json");
+        var json = JsonSerializer.Serialize(config, JsonOptions);
+        await File.WriteAllTextAsync(configPath, json, cancellationToken);
+
+        Log.Information("Saved ad set config: {Name}", adSetName);
+    }
+
+    public Task<IReadOnlyList<string>> GetAvailableFilesAsync(string adSetName, CancellationToken cancellationToken = default)
+    {
+        var folderPath = GetAdSetFolderPath(adSetName);
+        if (!Directory.Exists(folderPath))
+            return Task.FromResult<IReadOnlyList<string>>(Array.Empty<string>());
+
+        var files = Directory.GetFiles(folderPath)
+            .Where(f => VideoExtensions.Contains(Path.GetExtension(f).ToLowerInvariant()))
+            .Select(Path.GetFileName)
+            .Where(f => f is not null)
+            .Cast<string>()
+            .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        return Task.FromResult<IReadOnlyList<string>>(files);
+    }
+
     public string GetAdSetFolderPath(string adSetName)
     {
         return Path.Combine(_sharedFolderService.GetFullPath(FolderNames.AssetsAdSets), adSetName);
+    }
+
+    private static void ResolveFilePaths(AdSetConfig config, string adSetDir)
+    {
+        if (config.Doggy is { File: not null } doggy && !Path.IsPathRooted(doggy.File))
+            doggy.File = Path.Combine(adSetDir, doggy.File);
+        if (config.Popup is { File: not null } popup && !Path.IsPathRooted(popup.File))
+            popup.File = Path.Combine(adSetDir, popup.File);
+        if (config.Tvc is { File: not null } tvc && !Path.IsPathRooted(tvc.File))
+            tvc.File = Path.Combine(adSetDir, tvc.File);
     }
 }

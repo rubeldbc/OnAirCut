@@ -45,6 +45,15 @@ public class FfmpegRenderService
                 return (false, $"FFmpeg exit code {result.ExitCode}: {GetLastError(error)}");
             }
 
+            // Force 100% on successful completion (ffmpeg often stops at 99.x%)
+            ProgressChanged?.Invoke(this, new RenderProgressEventArgs
+            {
+                Progress = 100,
+                CurrentTime = totalDuration,
+                TotalDuration = totalDuration,
+                Speed = "done"
+            });
+
             Log.Information("FFmpeg render completed successfully");
             return (true, null);
         }

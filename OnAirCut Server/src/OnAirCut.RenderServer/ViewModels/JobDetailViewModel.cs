@@ -1,9 +1,11 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OnAirCut.Core.Enums;
+using OnAirCut.Core.Interfaces;
 using OnAirCut.Core.Models;
 using OnAirCut.RenderServer.Services;
 using Serilog;
@@ -62,13 +64,20 @@ public partial class JobDetailViewModel : ObservableObject
     [ObservableProperty]
     private string _processedAt = string.Empty;
 
+    // --- Ad config details ---
+    [ObservableProperty] private string _adConfigSummary = string.Empty;
+    [ObservableProperty] private bool _hasAdConfig;
+
     public ObservableCollection<StepLogEntry> StepLogs { get; } = [];
     public ObservableCollection<OcrResultEntry> OcrResults { get; } = [];
     public ObservableCollection<string> FrameThumbnails { get; } = [];
 
-    public JobDetailViewModel(SqliteRepository repository)
+    private readonly IAdSetProvider _adSetProvider;
+
+    public JobDetailViewModel(SqliteRepository repository, IAdSetProvider adSetProvider)
     {
         _repository = repository;
+        _adSetProvider = adSetProvider;
     }
 
     public async Task LoadJobAsync(string jobId)
@@ -85,6 +94,7 @@ public partial class JobDetailViewModel : ObservableObject
             SourceName = story.SourceName ?? string.Empty;
             SourceType = story.SourceType.ToString();
             AdSetName = story.AdSetName ?? string.Empty;
+            await LoadAdConfigSummaryAsync(story);
             Status = story.Status.ToString();
             ErrorMessage = story.ErrorMessage ?? string.Empty;
             OcrConfidence = story.OcrConfidence ?? 0;
@@ -137,6 +147,47 @@ public partial class JobDetailViewModel : ObservableObject
         catch (Exception ex)
         {
             Log.Error(ex, "Failed to load job detail for {JobId}", jobId);
+        }
+    }
+
+    private async Task LoadAdConfigSummaryAsync(ProcessedStory story)
+    {
+        HasAdConfig = false;
+        AdConfigSummary = string.Empty;
+
+        try
+        {
+            // Try from embedded JSON first, then from provider
+            AdSetConfig? config = null;
+            if (!string.IsNullOrEmpty(story.AdSetConfigJson))
+            {
+                config = JsonSerializer.Deserialize<AdSetConfig>(story.AdSetConfigJson,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            else if (!string.IsNullOrEmpty(story.AdSetName))
+            {
+                config = await _adSetProvider.GetAdSetByNameAsync(story.AdSetName);
+            }
+
+            if (config is null) return;
+
+            var lines = new List<string>();
+            if (config.Doggy is { } d)
+                lines.Add($"Doggy: {(d.Enabled ? "ON" : "OFF")} | {d.File ?? "—"} | Pos({d.PositionX:F0},{d.PositionY:F0}) Size({d.Width:F0}x{d.Height:F0}) Opacity({d.Opacity:F1})");
+            if (config.Popup is { } p)
+                lines.Add($"Popup: {(p.Enabled ? "ON" : "OFF")} | {p.File ?? "—"} | Play {p.TotalPlay}x @ {p.DurationPerTime:F1}s | Pos({p.PositionX:F0},{p.PositionY:F0}) Size({p.Width:F0}x{p.Height:F0})");
+            if (config.Tvc is { } t)
+                lines.Add($"TVC: {(t.Enabled ? "ON" : "OFF")} | {t.File ?? "—"} | Insert {t.Count}x");
+
+            if (lines.Count > 0)
+            {
+                HasAdConfig = true;
+                AdConfigSummary = string.Join("\n", lines);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to load ad config summary");
         }
     }
 

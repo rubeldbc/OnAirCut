@@ -23,6 +23,7 @@ public static class ServiceRegistration
         services.AddSingleton<OcrProcessor>();
         services.AddSingleton<OutputOrganizer>();
         services.AddSingleton<JobPipelineOrchestrator>();
+        services.AddSingleton<ApiService>();
 
         // Core interface implementations for Render Server
         services.AddSingleton<IAdSetProvider, FileBasedAdSetProvider>();

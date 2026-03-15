@@ -6,7 +6,12 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:vm="clr-namespace:OnAirCut.RenderServer.ViewModels"
              mc:Ignorable="d"
+             xmlns:converters="clr-namespace:OnAirCut.RenderServer.Converters"
              d:DataContext="{d:DesignInstance vm:DashboardViewModel}">
+
+    <UserControl.Resources>
+        <converters:StringToVisibilityConverter x:Key="StringToVis" />
+    </UserControl.Resources>
 
     <Grid Margin="16">
         <Grid.RowDefinitions>
@@ -102,6 +107,51 @@
                              Foreground="{DynamicResource SecondaryHueMidBrush}" />
                     </TextBlock>
                 </DockPanel>
+
+                <!-- Render Details Box -->
+                <Border Background="#1A1A2E" CornerRadius="6" Padding="10" Margin="0,4,0,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Source:" FontSize="11" Opacity="0.5" Margin="0,0,10,2" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SourceClipName}" FontSize="11" Foreground="#AAA" TextTrimming="CharacterEllipsis" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Output:" FontSize="11" Opacity="0.5" Margin="0,0,10,2" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding OutputFileName}" FontSize="11" Foreground="#66BB6A" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Duration:" FontSize="11" Opacity="0.5" Margin="0,0,10,2" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ClipDuration}" FontSize="11" Foreground="#AAA" FontFamily="Consolas" />
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Doggy:" FontSize="11" Opacity="0.5" Margin="0,0,10,1"
+                                   Visibility="{Binding AdDetailsDoggy, Converter={StaticResource StringToVis}}" />
+                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding AdDetailsDoggy}" FontSize="10" Foreground="#81D4FA"
+                                   TextTrimming="CharacterEllipsis"
+                                   Visibility="{Binding AdDetailsDoggy, Converter={StaticResource StringToVis}}" />
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Popup:" FontSize="11" Opacity="0.5" Margin="0,0,10,1"
+                                   Visibility="{Binding AdDetailsPopup, Converter={StaticResource StringToVis}}" />
+                        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding AdDetailsPopup}" FontSize="10" Foreground="#CE93D8"
+                                   TextTrimming="CharacterEllipsis"
+                                   Visibility="{Binding AdDetailsPopup, Converter={StaticResource StringToVis}}" />
+
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="TVC:" FontSize="11" Opacity="0.5" Margin="0,0,10,1"
+                                   Visibility="{Binding AdDetailsTvc, Converter={StaticResource StringToVis}}" />
+                        <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding AdDetailsTvc}" FontSize="10" Foreground="#FFD54F"
+                                   TextTrimming="CharacterEllipsis"
+                                   Visibility="{Binding AdDetailsTvc, Converter={StaticResource StringToVis}}" />
+                    </Grid>
+                </Border>
 
                 <ProgressBar Value="{Binding RenderProgress}" Minimum="0" Maximum="100"
                              Height="16" Margin="0,0,0,4"

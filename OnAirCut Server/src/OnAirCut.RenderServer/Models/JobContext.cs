@@ -16,5 +16,9 @@ public class JobContext
     public string? OutputVideoPath { get; set; }
     public string CurrentStep { get; set; } = string.Empty;
     public double Progress { get; set; }
+    public string? AdSetInfo { get; set; }
+    public string? DoggyDetail { get; set; }
+    public string? PopupDetail { get; set; }
+    public string? TvcDetail { get; set; }
     public CancellationTokenSource CancellationTokenSource { get; set; } = new();
 }

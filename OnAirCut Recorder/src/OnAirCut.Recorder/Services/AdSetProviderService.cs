@@ -16,8 +16,11 @@ public class AdSetProviderService : IAdSetProvider, IDisposable
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        PropertyNameCaseInsensitive = true
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = true
     };
+
+    private static readonly string[] VideoExtensions = [".mp4", ".mov", ".avi", ".mkv"];
 
     public AdSetProviderService(ISharedFolderService sharedFolderService)
     {
@@ -63,7 +66,9 @@ public class AdSetProviderService : IAdSetProvider, IDisposable
             {
                 foreach (var dir in Directory.GetDirectories(adSetsPath))
                 {
+                    var folderName = Path.GetFileName(dir);
                     var configFile = Path.Combine(dir, "config.json");
+
                     if (File.Exists(configFile))
                     {
                         try
@@ -73,7 +78,7 @@ public class AdSetProviderService : IAdSetProvider, IDisposable
                             if (config is not null)
                             {
                                 if (string.IsNullOrEmpty(config.Name))
-                                    config.Name = Path.GetFileName(dir);
+                                    config.Name = folderName;
                                 newAdSets.Add(config);
                             }
                         }
@@ -82,6 +87,7 @@ public class AdSetProviderService : IAdSetProvider, IDisposable
                             Log.Warning(ex, "Failed to read ad set config from {Path}", configFile);
                         }
                     }
+                    // Skip folders without config.json
                 }
             }
 
@@ -103,6 +109,35 @@ public class AdSetProviderService : IAdSetProvider, IDisposable
     {
         var adSet = _adSets.FirstOrDefault(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         return Task.FromResult(adSet);
+    }
+
+    public async Task SaveAdSetConfigAsync(string adSetName, AdSetConfig config, CancellationToken cancellationToken = default)
+    {
+        var folderPath = GetAdSetFolderPath(adSetName);
+        Directory.CreateDirectory(folderPath);
+
+        var configPath = Path.Combine(folderPath, "config.json");
+        var json = JsonSerializer.Serialize(config, JsonOptions);
+        await File.WriteAllTextAsync(configPath, json, cancellationToken);
+
+        Log.Information("Saved ad set config: {Name}", adSetName);
+    }
+
+    public Task<IReadOnlyList<string>> GetAvailableFilesAsync(string adSetName, CancellationToken cancellationToken = default)
+    {
+        var folderPath = GetAdSetFolderPath(adSetName);
+        if (!Directory.Exists(folderPath))
+            return Task.FromResult<IReadOnlyList<string>>(Array.Empty<string>());
+
+        var files = Directory.GetFiles(folderPath)
+            .Where(f => VideoExtensions.Contains(Path.GetExtension(f).ToLowerInvariant()))
+            .Select(Path.GetFileName)
+            .Where(f => f is not null)
+            .Cast<string>()
+            .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        return Task.FromResult<IReadOnlyList<string>>(files);
     }
 
     public string GetAdSetFolderPath(string adSetName)

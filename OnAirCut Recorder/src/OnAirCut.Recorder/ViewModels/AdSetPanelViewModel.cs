@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using OnAirCut.Core.Interfaces;
 using OnAirCut.Core.Models;
 using Serilog;
@@ -43,6 +44,12 @@ public partial class AdSetPanelViewModel : ObservableObject
             SelectedAdSet = null;
         }
         OnPropertyChanged(nameof(SelectedAdSetName));
+    }
+
+    [RelayCommand]
+    private void SelectAdSet(AdSetConfig? adSet)
+    {
+        SelectedAdSet = adSet;
     }
 
     public async Task LoadAdSetsAsync()

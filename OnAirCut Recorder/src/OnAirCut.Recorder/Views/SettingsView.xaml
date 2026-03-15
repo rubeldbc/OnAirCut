@@ -6,6 +6,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:vm="clr-namespace:OnAirCut.Recorder.ViewModels"
              xmlns:converters="clr-namespace:OnAirCut.Recorder.Converters"
+             xmlns:views="clr-namespace:OnAirCut.Recorder.Views"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance vm:SettingsViewModel}">
 
@@ -107,9 +108,9 @@
                                                                Margin="8,0,0,0" VerticalAlignment="Center" />
                                                 </StackPanel>
                                                 <TextBlock Text="{Binding Description}" FontSize="10" Opacity="0.6" />
-                                                <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                                <DockPanel Margin="0,2,0,0">
                                                     <!-- Green check or Red X -->
-                                                    <materialDesign:PackIcon Width="14" Height="14"
+                                                    <materialDesign:PackIcon Width="14" Height="14" DockPanel.Dock="Left"
                                                                              VerticalAlignment="Center" Margin="0,0,4,0">
                                                         <materialDesign:PackIcon.Style>
                                                             <Style TargetType="materialDesign:PackIcon">
@@ -125,8 +126,9 @@
                                                         </materialDesign:PackIcon.Style>
                                                     </materialDesign:PackIcon>
                                                     <TextBlock Text="{Binding Status}" FontSize="11"
-                                                               VerticalAlignment="Center" />
-                                                </StackPanel>
+                                                               VerticalAlignment="Center"
+                                                               TextTrimming="CharacterEllipsis" />
+                                                </DockPanel>
                                             </StackPanel>
 
                                             <!-- Download Button -->
@@ -335,6 +337,17 @@
                         </DockPanel>
                     </StackPanel>
                 </ScrollViewer>
+            </TabItem>
+
+            <!-- Advertise Manager Tab -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Advertisements" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="Advertise Manager" VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
+                <views:AdvertiseManagerView DataContext="{Binding AdvertiseManager}" />
             </TabItem>
 
             <!-- OCR Region Tab -->
@@ -562,6 +575,17 @@
                         </ScrollViewer>
                     </materialDesign:Card>
                 </Grid>
+            </TabItem>
+
+            <!-- History Tab -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="History" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="History" VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
+                <views:HistoryPanelView DataContext="{Binding HistoryPanel}" />
             </TabItem>
         </TabControl>
 

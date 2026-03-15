@@ -28,6 +28,16 @@ public class JobWatcherService : IDisposable
             SingleReader = false,
             SingleWriter = false
         });
+
+        // Auto-start watching when shared folder becomes healthy
+        _sharedFolderService.HealthChanged += (_, e) =>
+        {
+            if (e.IsHealthy && !_isWatching)
+            {
+                Log.Information("Shared folder became healthy, starting job watcher");
+                StartWatching();
+            }
+        };
     }
 
     public bool IsWatching => _isWatching;
@@ -35,6 +45,15 @@ public class JobWatcherService : IDisposable
     public ChannelReader<JobFile> JobReader => _jobChannel.Reader;
 
     public event EventHandler<int>? PendingCountChanged;
+
+    /// <summary>
+    /// Enqueue a job directly (from API submission). Bypasses file watcher.
+    /// </summary>
+    public async Task EnqueueJobAsync(JobFile job)
+    {
+        await _jobChannel.Writer.WriteAsync(job);
+        Log.Information("Job enqueued via API: {JobId}", job.JobId);
+    }
 
     public void StartWatching()
     {

@@ -131,6 +131,78 @@ public partial class HistoryPanelViewModel : ObservableObject, IDisposable
         await SearchInternalAsync();
     }
 
+    [RelayCommand]
+    private void OpenFile(ProcessedStory? story)
+    {
+        var path = story?.OutputVideoPath;
+        if (path is not null && File.Exists(path))
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = path,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex) { Log.Error(ex, "Failed to open file"); }
+        }
+    }
+
+    [RelayCommand]
+    private void OpenFileLocation(ProcessedStory? story)
+    {
+        var path = story?.OutputVideoPath;
+        if (path is not null && File.Exists(path))
+        {
+            try
+            {
+                System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{path}\"");
+            }
+            catch (Exception ex) { Log.Error(ex, "Failed to open file location"); }
+        }
+        else if (story?.OutputFolderPath is not null && Directory.Exists(story.OutputFolderPath))
+        {
+            OpenOutputFolder(story);
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveFromList(ProcessedStory? story)
+    {
+        if (story is null) return;
+        Stories.Remove(story);
+        TotalCount = Stories.Count;
+    }
+
+    [RelayCommand]
+    private void RemoveFromDisk(ProcessedStory? story)
+    {
+        if (story is null) return;
+
+        // Delete output video
+        if (story.OutputVideoPath is not null && File.Exists(story.OutputVideoPath))
+        {
+            try { File.Delete(story.OutputVideoPath); }
+            catch (Exception ex) { Log.Warning(ex, "Failed to delete output video"); }
+        }
+
+        // Delete output folder if empty
+        if (story.OutputFolderPath is not null && Directory.Exists(story.OutputFolderPath))
+        {
+            try
+            {
+                var remaining = Directory.GetFiles(story.OutputFolderPath).Length;
+                if (remaining == 0)
+                    Directory.Delete(story.OutputFolderPath, true);
+            }
+            catch (Exception ex) { Log.Warning(ex, "Failed to delete output folder"); }
+        }
+
+        Stories.Remove(story);
+        TotalCount = Stories.Count;
+    }
+
     public void Dispose()
     {
         if (_disposed) return;

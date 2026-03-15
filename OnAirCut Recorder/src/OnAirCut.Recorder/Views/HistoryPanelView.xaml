@@ -7,7 +7,8 @@
              xmlns:vm="clr-namespace:OnAirCut.Recorder.ViewModels"
              xmlns:converters="clr-namespace:OnAirCut.Recorder.Converters"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance vm:HistoryPanelViewModel}">
+             d:DataContext="{d:DesignInstance vm:HistoryPanelViewModel}"
+>
 
     <UserControl.Resources>
         <converters:StatusToColorConverter x:Key="StatusToColor" />
@@ -125,6 +126,40 @@
                       FontSize="12"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Auto">
+
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Open File"
+                                  Command="{Binding OpenFileCommand}"
+                                  CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="FileVideo" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Open File Location"
+                                  Command="{Binding OpenFileLocationCommand}"
+                                  CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="FolderOpen" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="Remove from List"
+                                  Command="{Binding RemoveFromListCommand}"
+                                  CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="PlaylistRemove" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Remove from Disk" Foreground="#EF5350"
+                                  Command="{Binding RemoveFromDiskCommand}"
+                                  CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="DeleteForever" Foreground="#EF5350" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Title" Binding="{Binding TitleNormalized}"
                                         Width="*" MinWidth="150" />

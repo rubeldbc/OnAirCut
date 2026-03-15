@@ -48,6 +48,10 @@ public partial class App : Application
         var adSetVm = _serviceProvider.GetRequiredService<AdSetPanelViewModel>();
         await adSetVm.LoadAdSetsAsync();
 
+        // Initialize advertise manager
+        var advertiseManagerVm = _serviceProvider.GetRequiredService<AdvertiseManagerViewModel>();
+        await advertiseManagerVm.InitializeAsync();
+
         // Show main window
         var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
         mainWindow.DataContext = _serviceProvider.GetRequiredService<MainWindowViewModel>();
@@ -57,8 +61,25 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         Log.Information("OnAirCut Recorder shutting down");
+
+        if (_serviceProvider is not null)
+        {
+            // Disconnect active video source (LibVLC MediaPlayer holds threads)
+            try
+            {
+                var sourceVm = _serviceProvider.GetRequiredService<SourcePanelViewModel>();
+                sourceVm.CurrentSource?.DisconnectAsync(CancellationToken.None).Wait(3000);
+            }
+            catch { }
+
+            // Dispose DI container (stops timers, FileSystemWatchers, EasyOCR process, etc.)
+            try { _serviceProvider.Dispose(); } catch { }
+        }
+
         Log.CloseAndFlush();
-        _serviceProvider?.Dispose();
         base.OnExit(e);
+
+        // Force-kill if background threads (LibVLC, NAudio) keep the process alive
+        Environment.Exit(0);
     }
 }

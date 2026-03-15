@@ -63,6 +63,9 @@ public class RecorderSettings
     [JsonPropertyName("ocrCropHeight")]
     public int OcrCropHeight { get; set; }
 
+    [JsonPropertyName("adPanelWidth")]
+    public double AdPanelWidth { get; set; } = 300;
+
     public RecorderSettings Clone()
     {
         return new RecorderSettings
@@ -86,6 +89,7 @@ public class RecorderSettings
             OcrCropY = OcrCropY,
             OcrCropWidth = OcrCropWidth,
             OcrCropHeight = OcrCropHeight,
+            AdPanelWidth = AdPanelWidth,
         };
     }
 }

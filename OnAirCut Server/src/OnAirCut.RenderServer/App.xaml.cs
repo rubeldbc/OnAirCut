@@ -56,6 +56,10 @@ public partial class App : Application
         var orchestrator = _serviceProvider.GetRequiredService<JobPipelineOrchestrator>();
         orchestrator.Start();
 
+        // Start API server
+        var apiService = _serviceProvider.GetRequiredService<ApiService>();
+        apiService.Start();
+
         // Show main window
         var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
         mainWindow.DataContext = _serviceProvider.GetRequiredService<MainWindowViewModel>();
@@ -82,6 +86,13 @@ public partial class App : Application
             {
                 var jobWatcher = _serviceProvider.GetRequiredService<JobWatcherService>();
                 jobWatcher.StopWatching();
+            }
+            catch { /* ignore shutdown errors */ }
+
+            try
+            {
+                var apiService = _serviceProvider.GetRequiredService<ApiService>();
+                apiService.Stop();
             }
             catch { /* ignore shutdown errors */ }
 

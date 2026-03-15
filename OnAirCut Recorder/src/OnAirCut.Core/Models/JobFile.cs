@@ -44,4 +44,7 @@ public class JobFile
 
     [JsonPropertyName("submittedAt")]
     public DateTime SubmittedAt { get; set; }
+
+    [JsonPropertyName("adSetConfigJson")]
+    public string? AdSetConfigJson { get; set; }
 }

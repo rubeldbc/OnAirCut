@@ -30,4 +30,5 @@ public class ProcessedStory
     public JobStatus Status { get; set; } = JobStatus.Pending;
     public string? ErrorMessage { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string? AdSetConfigJson { get; set; }
 }

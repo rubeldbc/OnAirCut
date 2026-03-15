@@ -80,6 +80,14 @@
                             <TextBlock Text="AdSet" Opacity="0.6" FontSize="12" />
                             <TextBlock Text="{Binding AdSetName}" FontWeight="Medium" FontSize="14" />
                         </StackPanel>
+                        <StackPanel Margin="0,4"
+                                    Visibility="{Binding HasAdConfig, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBlock Text="Ad Configuration" Opacity="0.6" FontSize="12" />
+                            <Border Background="#1A1A2E" CornerRadius="4" Padding="8" Margin="0,4,0,0">
+                                <TextBlock Text="{Binding AdConfigSummary}" FontFamily="Consolas"
+                                           FontSize="11" Foreground="#DDD" TextWrapping="Wrap" />
+                            </Border>
+                        </StackPanel>
                         <StackPanel Margin="0,4">
                             <TextBlock Text="Submitted" Opacity="0.6" FontSize="12" />
                             <TextBlock Text="{Binding SubmittedAt}" FontWeight="Medium" FontSize="14" />

@@ -219,22 +219,42 @@ public class JobPipelineOrchestrator : IDisposable
                 $"Title: '{normalizedTitle}', Confidence: {ocrConfidence:F1}%", stepStart);
 
             // Step 8: Render
-            await UpdateStepAsync(context, "Rendering", JobStatus.Rendering);
-            await _repository.UpdateStoryStatusAsync(job.JobId, JobStatus.Rendering, cancellationToken: cancellationToken);
-            stepStart = DateTime.UtcNow;
-
             AdSetConfig? adSet = null;
             if (!string.IsNullOrEmpty(job.AdSetName))
                 adSet = await _adSetProvider.GetAdSetByNameAsync(job.AdSetName, cancellationToken);
 
+            // Build ad info summary for display
+            var adInfo = BuildAdInfoSummary(job.AdSetName, adSet);
+            context.AdSetInfo = adInfo;
+            if (adSet?.Doggy is { Enabled: true } d)
+                context.DoggyDetail = $"{d.File ?? "—"} | Pos({d.PositionX:F0},{d.PositionY:F0}) {d.Width:F0}x{d.Height:F0} | Start {d.StartFrom:F1}s | Opacity {d.Opacity:F1}";
+            if (adSet?.Popup is { Enabled: true } p)
+                context.PopupDetail = $"{p.File ?? "—"} | {p.TotalPlay}x @ {p.DurationPerTime:F1}s | Pos({p.PositionX:F0},{p.PositionY:F0}) {p.Width:F0}x{p.Height:F0}";
+            if (adSet?.Tvc is { Enabled: true } t)
+                context.TvcDetail = $"{t.File ?? "—"} | Insert {t.Count}x";
+
+            var renderStepName = string.IsNullOrEmpty(adInfo) ? "Rendering" : $"Rendering | {adInfo}";
+            await UpdateStepAsync(context, renderStepName, JobStatus.Rendering);
+            await _repository.UpdateStoryStatusAsync(job.JobId, JobStatus.Rendering, cancellationToken: cancellationToken);
+            stepStart = DateTime.UtcNow;
+
             var tempOutputPath = Path.Combine(workDir, $"{job.JobId}_output.mp4");
             var ffmpegArgs = _commandBuilder.BuildArguments(job.RawClipPath, adSet, tempOutputPath, context.InputDuration);
+
+            // Log full ffmpeg command for debugging
+            var ffmpegPath = _settingsService.Settings.FFmpegPath;
+            Log.Information("FFmpeg command for job {JobId}:\n{Ffmpeg} {Args}", job.JobId, ffmpegPath, ffmpegArgs);
+            await _repository.InsertJobLogAsync(job.JobId, "FFmpeg", "Command",
+                $"{ffmpegPath} {ffmpegArgs}", stepStart, null, null);
 
             var (renderSuccess, renderError) = await _renderService.RenderAsync(
                 ffmpegArgs, context.InputDuration, context.CancellationTokenSource.Token);
 
             if (!renderSuccess)
+            {
+                Log.Error("FFmpeg failed for job {JobId}: {Error}", job.JobId, renderError);
                 throw new InvalidOperationException($"Render failed: {renderError}");
+            }
 
             await LogStepAsync(job.JobId, "Render", "Completed", null, stepStart);
 
@@ -345,15 +365,34 @@ public class JobPipelineOrchestrator : IDisposable
         if (CurrentJob != null)
         {
             CurrentJob.Progress = e.Progress;
+            var stepLabel = string.IsNullOrEmpty(CurrentJob.AdSetInfo)
+                ? "Rendering" : $"Rendering | {CurrentJob.AdSetInfo}";
             JobProgressChanged?.Invoke(this, new JobProgressEventArgs
             {
                 JobId = CurrentJob.JobFile.JobId,
-                Step = "Rendering",
+                Step = stepLabel,
                 Progress = e.Progress,
                 Speed = e.Speed,
-                Status = JobStatus.Rendering
+                Status = JobStatus.Rendering,
+                AdSetInfo = CurrentJob.AdSetInfo,
+                DoggyDetail = CurrentJob.DoggyDetail,
+                PopupDetail = CurrentJob.PopupDetail,
+                TvcDetail = CurrentJob.TvcDetail
             });
         }
+    }
+
+    private static string BuildAdInfoSummary(string? adSetName, AdSetConfig? config)
+    {
+        if (config is null || !config.HasAnyEnabled)
+            return string.IsNullOrEmpty(adSetName) ? "" : adSetName;
+
+        var parts = new List<string>();
+        if (!string.IsNullOrEmpty(adSetName)) parts.Add(adSetName);
+        if (config.Doggy is { Enabled: true }) parts.Add($"Doggy:{config.Doggy.File ?? "?"}");
+        if (config.Popup is { Enabled: true }) parts.Add($"Popup:{config.Popup.File ?? "?"} x{config.Popup.TotalPlay}");
+        if (config.Tvc is { Enabled: true }) parts.Add($"TVC:{config.Tvc.File ?? "?"} x{config.Tvc.Count}");
+        return string.Join(" | ", parts);
     }
 
     public void Dispose()
@@ -371,6 +410,10 @@ public class JobProgressEventArgs : EventArgs
     public double Progress { get; init; }
     public string? Speed { get; init; }
     public JobStatus Status { get; init; }
+    public string? AdSetInfo { get; init; }
+    public string? DoggyDetail { get; init; }
+    public string? PopupDetail { get; init; }
+    public string? TvcDetail { get; init; }
 }
 
 public class JobCompletedEventArgs : EventArgs

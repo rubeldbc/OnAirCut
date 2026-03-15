@@ -2,7 +2,9 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OnAirCut.Core.Constants;
@@ -60,6 +62,8 @@ public partial class SettingsViewModel : ObservableObject
     // Shared Folder Validation
     [ObservableProperty] private ObservableCollection<FolderValidationItem> _folderValidationItems = [];
 
+    public ObservableCollection<string> ServerAddresses { get; } = [];
+
     public List<string> VideoCodecOptions { get; } = ["libx264", "libx265", "libvpx-vp9", "h264_nvenc", "hevc_nvenc"];
     public List<string> PresetOptions { get; } = ["ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"];
     public List<string> AudioCodecOptions { get; } = ["aac", "libmp3lame", "libopus", "copy"];
@@ -95,6 +99,21 @@ public partial class SettingsViewModel : ObservableObject
         ApiPort = s.ApiPort;
         ApiEnabled = s.ApiEnabled;
         CleanupWorkingFolderAfterDays = s.CleanupWorkingFolderAfterDays;
+
+        // Populate server addresses
+        ServerAddresses.Clear();
+        try
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                    ServerAddresses.Add($"http://{ip}:{s.ApiPort}");
+            }
+        }
+        catch { }
+        if (ServerAddresses.Count == 0)
+            ServerAddresses.Add($"http://localhost:{s.ApiPort}");
     }
 
     [RelayCommand]
@@ -587,7 +606,22 @@ public partial class SettingsViewModel : ObservableObject
                 }
             };
             pipProc.Start();
+            // Must read redirected streams before WaitForExit to avoid deadlock
+            // when the OS pipe buffer (~4KB) fills up.
+            var pipStdout = pipProc.StandardOutput.ReadToEndAsync(ct);
+            var pipStderr = pipProc.StandardError.ReadToEndAsync(ct);
             await pipProc.WaitForExitAsync(ct);
+            await pipStdout;
+            var pipErr = await pipStderr;
+
+            if (pipProc.ExitCode != 0)
+            {
+                Log.Warning("get-pip.py failed (exit {Code}): {Stderr}",
+                    pipProc.ExitCode, pipErr.Length > 500 ? pipErr[..500] : pipErr);
+                item.Status = "pip installation failed! Check logs.";
+                item.IsDownloading = false;
+                return;
+            }
 
             try { File.Delete(getPipPath); } catch { }
         }
@@ -609,8 +643,12 @@ public partial class SettingsViewModel : ObservableObject
             }
         };
         installProc.Start();
+        // Must read redirected streams before WaitForExit to avoid deadlock
+        var installStdout = installProc.StandardOutput.ReadToEndAsync(ct);
+        var installStderr = installProc.StandardError.ReadToEndAsync(ct);
         await installProc.WaitForExitAsync(ct);
-        var stderr = await installProc.StandardError.ReadToEndAsync(ct);
+        await installStdout;
+        var stderr = await installStderr;
 
         if (installProc.ExitCode != 0)
         {

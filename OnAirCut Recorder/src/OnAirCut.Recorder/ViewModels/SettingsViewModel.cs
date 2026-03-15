@@ -26,14 +26,21 @@ public partial class SettingsViewModel : ObservableObject
     private readonly IOcrProfileProvider? _ocrProfileProvider;
     private readonly SourcePanelViewModel? _sourcePanelViewModel;
 
+    public AdvertiseManagerViewModel? AdvertiseManager { get; }
+    public HistoryPanelViewModel? HistoryPanel { get; }
+
     public SettingsViewModel(
         ISettingsService settingsService,
         IOcrProfileProvider? ocrProfileProvider = null,
-        SourcePanelViewModel? sourcePanelViewModel = null)
+        SourcePanelViewModel? sourcePanelViewModel = null,
+        AdvertiseManagerViewModel? advertiseManager = null,
+        HistoryPanelViewModel? historyPanel = null)
     {
         _settingsService = settingsService;
         _ocrProfileProvider = ocrProfileProvider;
         _sourcePanelViewModel = sourcePanelViewModel;
+        AdvertiseManager = advertiseManager;
+        HistoryPanel = historyPanel;
         LoadFromSettings();
     }
 
@@ -1218,7 +1225,22 @@ public partial class SettingsViewModel : ObservableObject
                 }
             };
             pipProc.Start();
+            // Must read redirected streams before WaitForExit to avoid deadlock
+            // when the OS pipe buffer (~4KB) fills up.
+            var pipStdout = pipProc.StandardOutput.ReadToEndAsync(ct);
+            var pipStderr = pipProc.StandardError.ReadToEndAsync(ct);
             await pipProc.WaitForExitAsync(ct);
+            await pipStdout;
+            var pipErr = await pipStderr;
+
+            if (pipProc.ExitCode != 0)
+            {
+                Log.Warning("get-pip.py failed (exit {Code}): {Stderr}",
+                    pipProc.ExitCode, pipErr.Length > 500 ? pipErr[..500] : pipErr);
+                item.Status = "pip installation failed! Check logs.";
+                item.IsDownloading = false;
+                return;
+            }
 
             try { File.Delete(getPipPath); } catch { }
         }
@@ -1234,7 +1256,7 @@ public partial class SettingsViewModel : ObservableObject
             StartInfo = new ProcessStartInfo
             {
                 FileName = pythonExe,
-                Arguments = "-m pip install easyocr --no-warn-script-location --progress-bar ascii",
+                Arguments = "-m pip install easyocr --no-warn-script-location",
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
@@ -1256,15 +1278,19 @@ public partial class SettingsViewModel : ObservableObject
 
                 if (line.Contains("Collecting"))
                 {
+                    packageCount++;
                     var pkg = line.Replace("Collecting ", "").Split(' ')[0];
-                    item.Status = $"Step 4/5: Downloading {pkg}...";
+                    // Show only the short package name, not the full wheel filename
+                    if (pkg.Length > 30) pkg = pkg[..30] + "...";
+                    item.Status = $"Step 4/5: Collecting {pkg} ({packageCount} packages)";
+                    item.DownloadProgress = Math.Min(40 + packageCount * 2, 75);
                 }
                 else if (line.Contains("Downloading"))
                 {
-                    // Extract package name and size from pip download line
-                    var parts = line.Trim();
-                    item.Status = $"Step 4/5: {parts}";
-                    item.DownloadProgress = Math.Min(40 + packageCount * 2, 75);
+                    // Show just the size, not the full filename
+                    var sizeMatch = System.Text.RegularExpressions.Regex.Match(line, @"\(([^)]+)\)");
+                    var sizeInfo = sizeMatch.Success ? $" ({sizeMatch.Groups[1].Value})" : "";
+                    item.Status = $"Step 4/5: Downloading package {packageCount}{sizeInfo}";
                 }
                 else if (line.Contains("Installing collected"))
                 {
